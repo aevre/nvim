@@ -11,6 +11,7 @@ _G.Config = {}
 require("theme").setup({ transparent = not vim.g.neovide, json = true })
 
 require("config.options")
+require("config.filetype")
 require("config.autocmds")
 require("config.keymaps")
 require("config.lsp")
