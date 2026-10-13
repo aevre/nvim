@@ -11,5 +11,6 @@ return {
 		background_colour = "#000000",
 		stages = "slide",
 		timeout = 1500,
+		merge_duplicates = true,
 	},
 }
