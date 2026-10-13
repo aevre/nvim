@@ -118,7 +118,6 @@ return {
 	branch = "main",
 	build = ":TSUpdate",
 	event = { "BufReadPre", "BufNewFile", "VeryLazy" },
-	-- dependencies = { "neovim-treesitter/treesitter-parser-registry" },
 	opts = {},
 	init = function()
 		local group = vim.api.nvim_create_augroup("ToolchainTreesitter", {
