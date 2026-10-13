@@ -155,7 +155,7 @@ Conform still uses the default behavior of the formatter list: if multiple forma
 
 Whether a formatter is installed is determined by the Mason package list, while whether a formatter is effective for the current project is determined by Conform's `condition`; these two decisions are independent. A formatter declared by a language specification does not mean that it will run in every project.
 
-GraphQL and Handlebars currently have no formatter mapping. Luau uses `stylua` through its language specification.
+GraphQL and Handlebars currently have no formatter mapping. Luau uses `stylua` through its language specification. Zsh uses `shfmt` and the shared Bash language server; ShellCheck does not support zsh, so its native `zsh -n` syntax check is used instead.
 
 ## Current Language List
 
@@ -164,6 +164,7 @@ The table below lists the formatter, CLI linter, and LSP declarations in the spe
 | Specification / filetype | Formatter | CLI linter | LSP |
 | --- | --- | --- | --- |
 | bash / bash, sh | shfmt | shellcheck | bash-language-server |
+| zsh / zsh | shfmt | zsh (`zsh -n`) | bash-language-server (shared) |
 | c / c | clang_format | — | clangd |
 | cpp / cpp | clang_format | — | clangd |
 | css / css, scss, less | Web combination | — | css-lsp, css-variables-language-server, emmet-language-server, stylelint-language-server, tailwindcss, biome, oxfmt |
@@ -189,7 +190,7 @@ The table below lists the formatter, CLI linter, and LSP declarations in the spe
 | xml / xml, svg | xmlformatter | — | — |
 | yaml / yaml | Web combination | — | — |
 
-Parser declarations are bash, c, cpp, go, java, javascript, json, kotlin, lua, markdown/markdown_inline, nix, python, rust, toml, typescript/tsx, vue/css/scss, xml, and yaml. The CSS, Dart, HTML, Luau, Nu, QML, and SQL specifications have no `treesitter` field.
+Parser declarations are bash, zsh, c, cpp, go, java, javascript, json, kotlin, lua, markdown/markdown_inline, nix, python, rust, toml, typescript/tsx, vue/css/scss, xml, and yaml. The CSS, Dart, HTML, Luau, Nu, QML, and SQL specifications have no `treesitter` field.
 
 ## Lint Rules
 
@@ -243,7 +244,7 @@ Name mappings are located in `lua/toolchain/mason.lua`. When adding an LSP, form
 
 Debug adapters and general auxiliary tools remain maintained in `extra_packages` and are not removed because the current language is not open. When a Mason registry refresh fails or a package does not exist, Mason itself reports the installation failure; this does not prevent language specifications from loading.
 
-LSPs are enabled by `FileType`: when a name mapping exists, the package must first be installed in Mason; without a mapping, `is_installed()` directly returns true, after which availability still depends on whether the command is executable. After installation succeeds, already-open buffers' services are retried. `dartls` has no Mason mapping and requires the Dart SDK; `rustfmt` is also unmapped and should be prepared separately. ESLint has no package name mapping, so CLI linting requires the project or PATH to provide it. `bacon-ls` has no name mapping but is included in the extra installation list.
+LSPs are enabled by `FileType`: when a name mapping exists, the package must first be installed in Mason; without a mapping, `is_installed()` directly returns true, after which availability still depends on whether the command is executable. After installation succeeds, already-open buffers' services are retried. `dartls` has no Mason mapping and requires the Dart SDK; `rustfmt` is also unmapped and should be prepared separately. ESLint has no package name mapping, so CLI linting requires the project or PATH to provide it. `bacon-ls` has no name mapping but is included in the extra installation list. The zsh filetype shares the `bash-language-server` package mapping with bash.
 
 `lsp/emmylua.lua`, `lsp/nushell.lua`, and `lsp/stylua.lua` are not currently enabled by language specifications. Java declares `jdtls`, whose configuration is only `cmd = "jdtls"`; it has no project workspace or debugging integration.
 

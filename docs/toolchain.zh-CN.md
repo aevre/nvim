@@ -183,7 +183,8 @@ Conform 的 `condition` 决定；这两个判断相互独立。某个 formatter 
 声明，并不表示它在每个项目中都会运行。
 
 Luau 通过语言规格使用 `stylua`。GraphQL 和 Handlebars 当前没有 formatter
-映射；需要时在语言规格中添加对应工具。
+映射；需要时在语言规格中添加对应工具。Zsh 使用 `shfmt` 和共享的 Bash
+language server；ShellCheck 不支持 zsh，因此改用原生 `zsh -n` 语法检查。
 
 ## 当前语言清单
 
@@ -193,6 +194,7 @@ Luau 通过语言规格使用 `stylua`。GraphQL 和 Handlebars 当前没有 for
 | 规格 / filetype | Formatter | CLI linter | LSP |
 | --- | --- | --- | --- |
 | bash / bash, sh | shfmt | shellcheck | bash-language-server |
+| zsh / zsh | shfmt | zsh（`zsh -n`） | bash-language-server（共享） |
 | c / c | clang_format | — | clangd |
 | cpp / cpp | clang_format | — | clangd |
 | css / css, scss, less | Web 组合 | — | css-lsp, css-variables-language-server, emmet-language-server, stylelint-language-server, tailwindcss, biome, oxfmt |
@@ -218,7 +220,7 @@ Luau 通过语言规格使用 `stylua`。GraphQL 和 Handlebars 当前没有 for
 | xml / xml, svg | xmlformatter | — | — |
 | yaml / yaml | Web 组合 | — | — |
 
-Parser 声明为 bash、c、cpp、go、java、javascript、json、kotlin、lua、
+Parser 声明为 bash、zsh、c、cpp、go、java、javascript、json、kotlin、lua、
 markdown/markdown_inline、nix、python、rust、toml、typescript/tsx、vue/css/scss、
 xml、yaml。CSS、Dart、HTML、Luau、Nu、QML、SQL 规格没有 `treesitter` 字段。
 
@@ -287,7 +289,8 @@ LSP 则按 `FileType` 启用：有名称映射时，必须先在 Mason 中安装
 `is_installed()` 直接返回 true，后续仍取决于命令是否可执行。安装成功后会
 重试已打开 buffer 的服务。`dartls` 无 Mason 映射，需要 Dart SDK；`rustfmt`
 也未映射，应自行准备。ESLint 没有包名映射，CLI lint 需要项目或 PATH 提供。
-`bacon-ls` 没有名称映射，但已列入额外安装清单。
+`bacon-ls` 没有名称映射，但已列入额外安装清单。zsh filetype 与 bash 共用
+`bash-language-server` 的 Mason 包映射。
 
 `lsp/emmylua.lua`、`lsp/nushell.lua`、`lsp/stylua.lua` 当前没有被语言规格启用。
 Java 声明了 `jdtls`，其配置仅为 `cmd = "jdtls"`，没有项目 workspace 或调试集成。
