@@ -16,7 +16,7 @@ function M.setup(extra_plugins)
 	---@type LazyConfig
 	local opts = {
 		defaults = {
-			version = false,
+			version = nil,
 		},
 		spec = vim.list_extend(plugin_spec, extra_plugins or {}),
 		dev = {
@@ -27,7 +27,7 @@ function M.setup(extra_plugins)
 			patterns = { "." },
 			fallback = true,
 		},
-		install = { colorscheme = { "tokyonight" } },
+		install = { colorscheme = nil },
 		checker = { enabled = true },
 		ui = {
 			border = "rounded",
