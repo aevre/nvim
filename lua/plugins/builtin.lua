@@ -6,9 +6,5 @@ return {
 	priority = 1000,
 	main = "builtin",
 	---@type builtin.Config
-	opts = {
-		scroll = {
-			enabled = true,
-		},
-	},
+	opts = {},
 }

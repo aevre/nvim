@@ -97,52 +97,11 @@ end
 
 function M.setup(opts)
 	opts = opts or {}
-	local defaults = {
-		scroll = { enabled = false },
-	}
-	config = vim.tbl_deep_extend("force", defaults, config, opts)
-	for _, module_config in pairs(config) do
-		if type(module_config) == "table" and module_config.enabled == nil then
-			module_config.enabled = true
-		end
-	end
-
-	local events = {
-		UIEnter = { "scroll" },
-	}
-
-	---@param event string
-	---@param ev? vim.api.keyset.create_autocmd.callback_args
-	local function load(event, ev)
-		local todo = events[event] or {}
-		events[event] = nil
-		for _, module in ipairs(todo) do
-			local module_config = M.config[module]
-			if module_config and module_config.enabled then
-				local implementation = M[module]
-				if implementation.setup then
-					implementation.setup(module_config, ev)
-				elseif implementation.enable then
-					implementation.enable(module_config, ev)
-				end
-			end
-		end
-	end
-
-	if vim.v.vim_did_enter == 1 then
-		load("UIEnter")
-	end
-
-	if next(events) then
-		local group = vim.api.nvim_create_augroup("builtin", { clear = true })
-		vim.api.nvim_create_autocmd(vim.tbl_keys(events --[[@as table]]), {
-			group = group,
-			once = true,
-			nested = true,
-			callback = function(ev)
-				load(ev.event, ev)
-			end,
-		})
+	config = vim.tbl_deep_extend("force", config, opts)
+	if config.win then
+		local win_config = vim.deepcopy(config.win)
+		win_config.enabled = nil
+		require("win").setup(win_config)
 	end
 end
 

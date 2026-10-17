@@ -15,23 +15,8 @@ function M.get(palette, opts)
 	local notify_debug = diag.hint or palette.green
 	local notify_trace = palette.purple
 	local notify_success = palette.green_bright or palette.green
-	local border = palette.border_highlight or palette.border or palette.fg_gutter
 
 	return {
-		BuiltinNormal = "NormalFloat",
-		BuiltinNormalNC = "NormalFloat",
-		BuiltinTitle = "FloatTitle",
-		BuiltinFooter = "FloatFooter",
-		BuiltinFooterDesc = "DiagnosticInfo",
-		BuiltinFooterKey = "DiagnosticVirtualTextInfo",
-		BuiltinWinBar = "Title",
-		BuiltinWinBarNC = "Title",
-		BuiltinWinKey = "Keyword",
-		BuiltinWinKeySep = "NonText",
-		BuiltinWinKeyDesc = "Function",
-		BuiltinWinSeparator = "WinSeparator",
-		BuiltinActiveBorder = { fg = border, bg = float_bg },
-
 		BuiltinNotifyErrorBorder = { fg = notify_error, bg = float_bg, bold = true },
 		BuiltinNotifyWarnBorder = { fg = notify_warn, bg = float_bg, bold = true },
 		BuiltinNotifyInfoBorder = { fg = notify_info, bg = float_bg, bold = true },

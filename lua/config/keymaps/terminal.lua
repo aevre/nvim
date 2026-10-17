@@ -27,14 +27,14 @@ local self_keys = {
 	{
 		"<leader>gg",
 		function()
-			Builtin.lazygit()
+			require("lazygit").open()
 		end,
 		desc = "Lazygit",
 	},
 	{
 		"<leader>tf",
 		function()
-			Builtin.terminal(nil, { win = win })
+			require("terminal").toggle(nil, { win = win })
 		end,
 
 		desc = "Terminal Float",
@@ -42,7 +42,7 @@ local self_keys = {
 	{
 		"<leader>tm",
 		function()
-			Builtin.terminal("rmpc", { win = win })
+			require("terminal").toggle("rmpc", { win = win })
 		end,
 		desc = "Music Player",
 		silent = true,
