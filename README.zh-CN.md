@@ -77,7 +77,7 @@ lua/config/                选项、自动命令、全局键位、LSP、插件�
 lua/plugins/               按功能分组的 lazy.nvim spec 与插件内部模块
 lua/toolchain/             语言规格、工具条件、Mason 名称映射
 lsp/                       原生 LSP 的命令、根目录与 settings
-lua/builtin/               本地终端、Lazygit、窗口、buffer、滚动功能
+lua/builtin/               本地 buffer 工具
 lua/theme/                 调色板、高亮与透明背景
 palette.json               当前主题的 JSON 覆盖值
 lua/sources/               fzf 的语言、LSP、通知、图标数据源

@@ -144,7 +144,7 @@
 | `<leader>cf` | `n` | 格式化 |
 | `<leader>cD` | `n` | CodeDiff |
 
-来源：[terminal.lua](../lua/config/keymaps/terminal.lua)、[lazy.lua](../lua/config/lazy.lua)、[persistence.lua](../lua/plugins/qol/persistence.lua)、[yanky.lua](../lua/plugins/qol/yanky.lua)、[screenkey.lua](../lua/plugins/ui/screenkey.lua)、[mason.lua](../lua/plugins/lsp/mason.lua)、[formatter.lua](../lua/plugins/formatter.lua)、[codediff.lua](../lua/plugins/editor/codediff.lua)。内置终端的普通模式提供 `q` 隐藏、`gf` 打开光标文件；默认终端模式的双击 `<Esc>` 被上述浮窗配置的 `jk` 替代，见 [builtin/terminal.lua](../lua/builtin/terminal.lua)。
+来源：[terminal.lua](../lua/config/keymaps/terminal.lua)、[lazy.lua](../lua/config/lazy.lua)、[persistence.lua](../lua/plugins/qol/persistence.lua)、[yanky.lua](../lua/plugins/qol/yanky.lua)、[screenkey.lua](../lua/plugins/ui/screenkey.lua)、[mason.lua](../lua/plugins/lsp/mason.lua)、[formatter.lua](../lua/plugins/formatter.lua)、[codediff.lua](../lua/plugins/editor/codediff.lua)。终端插件提供 `q` 隐藏、`gf` 打开光标文件；浮窗配置使用 `jk` 退出终端模式。
 
 ## 编码、补全与文本对象
 

@@ -5,6 +5,5 @@ return {
 	lazy = false,
 	priority = 1000,
 	main = "builtin",
-	---@type builtin.Config
 	opts = {},
 }

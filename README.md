@@ -77,7 +77,7 @@ lua/config/                Options, autocmds, global keys, LSP, plugin bootstrap
 lua/plugins/               Lazy specs by feature and plugin implementation modules
 lua/toolchain/             Language specs, tool conditions, Mason package mappings
 lsp/                       Native LSP commands, roots, and settings
-lua/builtin/               Local terminal, Lazygit, window, buffer, scrolling features
+lua/builtin/               Local buffer utilities
 lua/theme/                 Palette, highlights, and transparency
 palette.json               JSON overrides for the current theme
 lua/sources/               Language, LSP, notification, and icon sources for fzf

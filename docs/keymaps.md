@@ -144,7 +144,7 @@ Source: [lsp.lua](../lua/config/lsp.lua), [diagnostic.lua](../lua/config/keymaps
 | `<leader>cf` | `n` | Format |
 | `<leader>cD` | `n` | CodeDiff |
 
-Source: [terminal.lua](../lua/config/keymaps/terminal.lua), [lazy.lua](../lua/config/lazy.lua), [persistence.lua](../lua/plugins/qol/persistence.lua), [yanky.lua](../lua/plugins/qol/yanky.lua), [screenkey.lua](../lua/plugins/ui/screenkey.lua), [mason.lua](../lua/plugins/lsp/mason.lua), [formatter.lua](../lua/plugins/formatter.lua), [codediff.lua](../lua/plugins/editor/codediff.lua). Built-in terminal normal mode provides `q` to hide and `gf` to open the file under the cursor; the default terminal-mode double `<Esc>` is replaced by the floating configuration's `jk`, see [builtin/terminal.lua](../lua/builtin/terminal.lua).
+Source: [terminal.lua](../lua/config/keymaps/terminal.lua), [lazy.lua](../lua/config/lazy.lua), [persistence.lua](../lua/plugins/qol/persistence.lua), [yanky.lua](../lua/plugins/qol/yanky.lua), [screenkey.lua](../lua/plugins/ui/screenkey.lua), [mason.lua](../lua/plugins/lsp/mason.lua), [formatter.lua](../lua/plugins/formatter.lua), [codediff.lua](../lua/plugins/editor/codediff.lua). The terminal plugin provides `q` to hide and `gf` to open the file under the cursor; the floating configuration uses `jk` to leave terminal mode.
 
 ## Coding, Completion, and Text Objects
 
