@@ -1,6 +1,6 @@
 ---@type LazyPluginSpec
 local im_switch_win = {
-	"immoratl521/ime_toggle",
+	"aevre/ime_toggle",
 	event = "InsertEnter",
 	opts = {},
 }

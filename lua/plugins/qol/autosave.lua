@@ -1,6 +1,6 @@
 ---@type LazyPluginSpec
 return {
-	"immortal521/auto-save.nvim",
+	"aevre/auto-save.nvim",
 	event = "BufEdit",
 	opts = {
 		debounced_dekay = 1000,
