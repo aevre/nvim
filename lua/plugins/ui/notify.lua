@@ -2,7 +2,7 @@
 return {
 	"https://codeberg.org/aevre/notify.nvim",
 	name = "notify.nvim",
-	dir = vim.fn.expand("~/Projects/lib/notify.nvim"),
+	dir = vim.env.NVIM_PLUGIN_MODE == "dev" and vim.fn.expand("~/Projects/lib/notify.nvim") or nil,
 	lazy = false,
 	dependencies = { "win.nvim", "animate.nvim" },
 	config = function(_, opts)

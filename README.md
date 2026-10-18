@@ -97,6 +97,6 @@ Startup order: theme → options → autocmds → keymaps → LSP/toolchain → 
 - Add or adjust languages: see the [toolchain guide](docs/toolchain.md); `<leader>cL` opens a definition directly.
 - LSP parameters: [lsp/](lsp/). A file's presence does not enable a server: the language declaration, installation, and root conditions must also be satisfied.
 - Theme: [lua/theme/](lua/theme/) and [palette.json](palette.json). Startup applies the local theme directly; it does not run `colorscheme tokyonight`. `:TransparentToggle` toggles and persists transparency.
-- Local plugin development: point `NVIM_DEV_DIR` at your local plugin directory. Lazy is configured for local matching with a remote fallback.
+- Local plugin development: set `NVIM_PLUGIN_MODE=dev` to load the six personal plugins (`win`, `animate`, `scroll`, `terminal`, `lazygit`, `notify`) from `~/Projects/lib`; unset it or use another value to load their Codeberg repositories. `NVIM_DEV_DIR` remains Lazy's separate generic local-plugin matcher.
 
 Use `:Lazy update` to update plugins, or `:Lazy restore` to restore versions from the committed lockfile. `<leader>pu` calls native Neovim `vim.pack.update()`; it does not update Lazy-managed plugins.

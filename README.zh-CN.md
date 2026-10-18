@@ -97,6 +97,6 @@ lazy-lock.json             插件版本锁定
 - 添加或调整语言：[工具链文档](docs/toolchain.zh-CN.md)，使用 `<leader>cL` 直接打开规格。
 - LSP 参数：[lsp/](lsp/)。文件存在不代表已启用，还需语言规格声明、安装与根目录条件满足。
 - 主题：[lua/theme/](lua/theme/) 和 [palette.json](palette.json)。当前入口直接应用本地主题，没有调用 `colorscheme tokyonight`；`:TransparentToggle` 切换并持久化透明状态。
-- 本地插件开发：`NVIM_DEV_DIR` 指向本地插件目录，Lazy 设置了本地匹配与远端 fallback。
+- 自有插件本地开发：设置 `NVIM_PLUGIN_MODE=dev`，即可从 `~/Projects/lib` 加载 `win`、`animate`、`scroll`、`terminal`、`lazygit`、`notify` 六个插件；未设置或使用其他值时从 Codeberg 加载。`NVIM_DEV_DIR` 仍是 Lazy 独立的通用本地插件匹配设置。
 
 更新插件使用 `:Lazy update`；如需按已提交的锁文件恢复版本，使用 `:Lazy restore`。`<leader>pu` 调用的是 Neovim 原生 `vim.pack.update()`，不等于更新 Lazy 管理的插件。

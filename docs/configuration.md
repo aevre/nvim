@@ -22,7 +22,7 @@ Lazy imports `plugins` and the `coding`, `colorschemes`, `deps`, `editor`, `high
 | Sessions | persistence.nvim loads on `BufReadPre`; separate keymaps restore and select sessions |
 | Search and replace | grug-far loads through commands/keymaps |
 | UI | Alpha loads on `VimEnter`, Heirline on `UIEnter`; Incline, indent guides, and Treesitter context load on `BufEdit` |
-| Messages and diagnostics | Noice loads at startup, and nvim-notify is enabled; tiny-inline-diagnostic loads on `LspAttach` and disables native virtual text |
+| Messages and diagnostics | Noice loads at startup for command-line and message UI, notify.nvim owns `vim.notify`; tiny-inline-diagnostic loads on `LspAttach` and disables native virtual text |
 | Other | Which-key loads on `VeryLazy`; Yanky and Screenkey are triggered by keymaps; WakaTime loads on `BufEdit` |
 | HTTP | nvim-http-client loads through `VeryLazy`, `http/rest`, or keymaps; it searches upward for `http-client.env.json` |
 | AI | Minuet and llm.nvim are both configured to load on `BufEdit`; Minuet is also a dependency of blink.cmp |

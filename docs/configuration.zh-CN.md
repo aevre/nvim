@@ -22,7 +22,7 @@ Lazy 导入 `plugins` 以及 `coding`、`colorschemes`、`deps`、`editor`、`hi
 | 会话 | persistence.nvim 在 `BufReadPre` 加载；恢复与选择会话有独立快捷键 |
 | 搜索替换 | grug-far 通过命令/快捷键加载 |
 | UI | Alpha 在 `VimEnter`，Heirline 在 `UIEnter`；Incline、缩进线、Treesitter context 在 `BufEdit` |
-| 消息与诊断 | Noice 启动加载，nvim-notify 启用；tiny-inline-diagnostic 在 `LspAttach` 加载并关闭原生 virtual text |
+| 消息与诊断 | Noice 启动加载并负责命令行与消息界面，notify.nvim 接管 `vim.notify`；tiny-inline-diagnostic 在 `LspAttach` 加载并关闭原生 virtual text |
 | 其他 | Which-key 在 `VeryLazy`，Yanky 和 Screenkey 由键位触发；WakaTime 在 `BufEdit` |
 | HTTP | nvim-http-client 通过 `VeryLazy`、`http/rest` 或快捷键加载；向上查找 `http-client.env.json` |
 | AI | Minuet 与 llm.nvim 均配置为 `BufEdit` 加载；Minuet 也是 blink.cmp 的依赖 |
