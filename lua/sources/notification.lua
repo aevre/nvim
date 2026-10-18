@@ -27,6 +27,12 @@ local function build_preview_lines(item)
 	if title[2] and title[2] ~= "" then
 		lines[#lines + 1] = string.format("- **Time**: `%s`", title[2])
 	end
+	if item.source == "fidget" then
+		lines[#lines + 1] = string.format("- **State**: `%s`", item.state or "unknown")
+		if item.percentage ~= nil then
+			lines[#lines + 1] = string.format("- **Progress**: `%s%%`", item.percentage)
+		end
+	end
 
 	vim.list_extend(lines, { "", "## Message", "" })
 
@@ -41,17 +47,17 @@ end
 
 ---获取格式化后的 Notification 历史列表数据
 ---@return table[]
-function M.source()
-	---@diagnostic disable-next-line: undefined-field
-	local history = require("notify").history()
+function M.source(kind)
+	local notify = require("notify")
+	local history = kind == "fidget" and notify.fidget.history() or notify.history()
 
 	if vim.tbl_isempty(history) then
 		return {}
 	end
 
-	-- 按 ID 倒序（最新的在前）
+	-- 按时间倒序（最新的在前）
 	table.sort(history, function(a, b)
-		return a.id > b.id
+		return a.time > b.time
 	end)
 
 	local items = {}
@@ -74,15 +80,15 @@ function M.source()
 	return items
 end
 
-function M.picker(opts)
+function M.picker(opts, kind)
 	opts = opts or {}
 	local fzf = require("fzf-lua")
 	local builtin = require("fzf-lua.previewer.builtin")
 
-	local items = M.source()
+	local items = M.source(kind)
 
 	if #items == 0 then
-		vim.notify("No notifications found", vim.log.levels.WARN)
+		vim.notify(kind == "fidget" and "No Fidget history found" or "No notifications found", vim.log.levels.WARN)
 		return
 	end
 
@@ -124,7 +130,7 @@ function M.picker(opts)
 
 	-- 调用 fzf-lua
 	fzf.fzf_exec(entries, {
-		prompt = "Notifications> ",
+		prompt = kind == "fidget" and "Fidget History> " or "Notifications> ",
 		previewer = NotifyPreviewer,
 		actions = {
 			["default"] = function(selected)
@@ -151,6 +157,10 @@ function M.picker(opts)
 			end,
 		},
 	})
+end
+
+function M.fidget_picker(opts)
+	return M.picker(opts, "fidget")
 end
 
 return M

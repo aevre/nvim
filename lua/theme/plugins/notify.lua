@@ -1,6 +1,6 @@
 local M = {}
 
-M.url = "https://github.com/rcarriga/nvim-notify"
+M.url = "https://codeberg.org/aevre/notify.nvim"
 
 ---@param foreground string
 ---@param alpha number
@@ -45,26 +45,43 @@ function M.get(palette, opts)
 		NotifyDEBUGBorder = { fg = blend(debug_color, 0.3, bg_base), bg = bg_color },
 		NotifyDEBUGIcon = { fg = debug_color },
 		NotifyDEBUGTitle = { fg = debug_color, bold = true },
+		NotifyDEBUGSeparator = { fg = blend(debug_color, 0.45, bg_base) },
+		NotifyDEBUGMessage = { fg = palette.fg },
 
 		NotifyERRORBody = { fg = palette.fg, bg = bg_color },
 		NotifyERRORBorder = { fg = blend(err_color, 0.3, bg_base), bg = bg_color },
 		NotifyERRORIcon = { fg = err_color },
 		NotifyERRORTitle = { fg = err_color, bold = true },
+		NotifyERRORSeparator = { fg = blend(err_color, 0.45, bg_base) },
+		NotifyERRORMessage = { fg = palette.fg },
 
 		NotifyINFOBody = { fg = palette.fg, bg = bg_color },
 		NotifyINFOBorder = { fg = blend(info_color, 0.3, bg_base), bg = bg_color },
 		NotifyINFOIcon = { fg = info_color },
 		NotifyINFOTitle = { fg = info_color, bold = true },
+		NotifyINFOSeparator = { fg = blend(info_color, 0.45, bg_base) },
+		NotifyINFOMessage = { fg = palette.fg },
 
 		NotifyTRACEBody = { fg = palette.fg, bg = bg_color },
 		NotifyTRACEBorder = { fg = blend(trace_color, 0.3, bg_base), bg = bg_color },
 		NotifyTRACEIcon = { fg = trace_color },
 		NotifyTRACETitle = { fg = trace_color, bold = true },
+		NotifyTRACESeparator = { fg = blend(trace_color, 0.45, bg_base) },
+		NotifyTRACEMessage = { fg = palette.fg },
 
 		NotifyWARNBody = { fg = palette.fg, bg = bg_color },
 		NotifyWARNBorder = { fg = blend(warn_color, 0.3, bg_base), bg = bg_color },
 		NotifyWARNIcon = { fg = warn_color },
 		NotifyWARNTitle = { fg = warn_color, bold = true },
+		NotifyWARNSeparator = { fg = blend(warn_color, 0.45, bg_base) },
+		NotifyWARNMessage = { fg = palette.fg },
+
+		NotifyProgress = { fg = palette.fg, bg = bg_color },
+		NotifyProgressSpinner = "Constant",
+		NotifyProgressTitle = "NonText",
+		NotifyProgressTask = "NonText",
+		NotifyProgressMessage = { fg = palette.fg_muted or palette.comment or palette.fg },
+		NotifyProgressPercentage = { fg = info_color, bold = true },
 	}
 end
 

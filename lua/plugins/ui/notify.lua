@@ -1,16 +1,20 @@
-vim.api.nvim_set_hl(0, "NotifyBackground", {
-	bg = "NONE",
-})
 ---@type LazyPluginSpec
 return {
-	"rcarriga/nvim-notify",
-	enabled = true,
-	---@type notify.Config
+	"https://codeberg.org/aevre/notify.nvim",
+	name = "notify.nvim",
+	dir = vim.fn.expand("~/Projects/lib/notify.nvim"),
+	lazy = false,
+	dependencies = { "win.nvim", "animate.nvim" },
+	config = function(_, opts)
+		require("notify").setup(opts)
+	end,
 	opts = {
-		max_width = 50,
-		background_colour = "#000000",
-		stages = "slide",
 		timeout = 1500,
-		merge_duplicates = true,
+		max_width = 0.4,
+		min_width = 40,
+		max_height = 0.6,
+		gap = 0,
+		margin = { top = 1, right = 1, bottom = 0 },
+		lsp_progress = { throttle = 80, margin_bottom = 1, margin_right = 1 },
 	},
 }

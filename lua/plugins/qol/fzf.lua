@@ -122,6 +122,14 @@ return {
 		},
 
 		{
+			"<leader>fn",
+			function()
+				require("sources.notification").fidget_picker()
+			end,
+			desc = "Fidget History",
+		},
+
+		{
 			"<leader>cL",
 			function()
 				require("sources.language").picker()

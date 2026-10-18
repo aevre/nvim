@@ -6,13 +6,12 @@ return {
 
 	---@type NoiceConfig
 	opts = {
-		-- 通知由 nvim-notify 接管，避免 Noice 与其重复覆盖 vim.notify。
-		-- notify = {
-		-- 	enabled = false,
-		-- },
+		notify = {
+			enabled = false,
+		},
 		lsp = {
 			progress = {
-				enabled = true,
+				enabled = false,
 			},
 			signature = { enabled = false },
 			override = {
