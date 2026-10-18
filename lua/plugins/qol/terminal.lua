@@ -8,7 +8,16 @@ return {
 	opts = {
 		win = {
 			style = "terminal",
-			wo = { winhighlight = "FloatBorder:AevreWinNormal" },
+			wo = {
+				winhighlight = table.concat({
+					"Normal:TerminalNormal",
+					"NormalNC:TerminalNormalNC",
+					"FloatBorder:TerminalBorder",
+					"FloatTitle:TerminalTitle",
+					"WinBar:TerminalWinBar",
+					"WinBarNC:TerminalWinBarNC",
+				}, ","),
+			},
 		},
 	},
 }

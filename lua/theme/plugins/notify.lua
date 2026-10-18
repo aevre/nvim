@@ -76,6 +76,9 @@ function M.get(palette, opts)
 		NotifyWARNSeparator = { fg = blend(warn_color, 0.45, bg_base) },
 		NotifyWARNMessage = { fg = palette.fg },
 
+		NotifyFidgetBackground = { bg = bg_color },
+		NotifyFidgetLevel = { fg = info_color, bold = true },
+
 		NotifyProgress = { fg = palette.fg, bg = bg_color },
 		NotifyProgressSpinner = "Constant",
 		NotifyProgressTitle = "NonText",

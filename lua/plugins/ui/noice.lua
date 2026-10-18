@@ -3,16 +3,12 @@
 return {
 	"folke/noice.nvim",
 	lazy = false,
+	enabled = false,
 
 	---@type NoiceConfig
 	opts = {
 		notify = {
-			enabled = false,
-		},
-		views = {
-			notify = {
-				view = "mini",
-			},
+			enabled = true,
 		},
 		lsp = {
 			progress = {
