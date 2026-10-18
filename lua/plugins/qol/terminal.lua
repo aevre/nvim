@@ -5,8 +5,10 @@ return {
 	dir = vim.env.NVIM_PLUGIN_MODE == "dev" and vim.fn.expand("~/Projects/lib/terminal.nvim") or nil,
 	lazy = false,
 	dependencies = { "win.nvim" },
-	config = function(_, opts)
-		require("terminal").setup(opts)
-	end,
-	opts = {},
+	opts = {
+		win = {
+			style = "terminal",
+			wo = { winhighlight = "FloatBorder:AevreWinNormal" },
+		},
+	},
 }
