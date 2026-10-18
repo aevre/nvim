@@ -128,6 +128,15 @@ function M.picker(opts, kind)
 		return vim.tbl_extend("force", self.winopts, { wrap = true, number = false })
 	end
 
+	function NotifyPreviewer:reset_winhl(win)
+		NotifyPreviewer.super.reset_winhl(self, win)
+		vim.wo[win].winhl = table.concat({
+			vim.wo[win].winhl,
+			"EndOfBuffer:" .. self.win.hls.preview_normal,
+			"NonText:" .. self.win.hls.preview_normal,
+		}, ",")
+	end
+
 	-- 调用 fzf-lua
 	fzf.fzf_exec(entries, {
 		prompt = kind == "fidget" and "Fidget History> " or "Notifications> ",
