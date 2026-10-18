@@ -9,6 +9,11 @@ return {
 		notify = {
 			enabled = false,
 		},
+		views = {
+			notify = {
+				view = "mini",
+			},
+		},
 		lsp = {
 			progress = {
 				enabled = false,
