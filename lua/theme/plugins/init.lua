@@ -3,6 +3,7 @@ local M = {}
 -- stylua: ignore
 M.plugins = {
 	["builtin"]                     = "builtin",
+	["cmdline.nvim"]                = "cmdline",
 	["win.nvim"]                     = "win",
 	["aerial.nvim"]                   = "aerial",
   ["alpha-nvim"]                    = "alpha",
@@ -20,7 +21,6 @@ M.plugins = {
   ["mini.surround"]                 = "mini_surround",
   ["noice.nvim"]                    = "noice",
   ["notify.nvim"]                   = "notify",
-  ["nvim-notify"]                   = "nvim_notify",
   ["terminal.nvim"]                 = "terminal",
   ["nvim-treesitter-context"]       = "treesitter-context",
   ["nvim-treesitter"]               = "treesitter",
