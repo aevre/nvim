@@ -116,7 +116,7 @@ return {
 		{
 			"<leader>n",
 			function()
-				require("sources.notification").picker()
+				require("notify").picker()
 			end,
 			desc = "Notification History",
 		},
@@ -124,7 +124,7 @@ return {
 		{
 			"<leader>fn",
 			function()
-				require("sources.notification").fidget_picker()
+				require("notify").picker({ kind = "fidget" })
 			end,
 			desc = "Fidget History",
 		},
