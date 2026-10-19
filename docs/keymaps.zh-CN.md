@@ -177,7 +177,7 @@
 
 来源：[blink-cmp.lua](../lua/plugins/coding/blink-cmp.lua)、[flash.lua](../lua/plugins/qol/flash.lua)、[treesitter-textobjects.lua](../lua/plugins/editor/treesitter-textobjects.lua)、[mini-surround.lua](../lua/plugins/editor/mini-surround.lua)、[dial.lua](../lua/plugins/editor/dial.lua)。`f/F/t/T` 也在 `n,x,o` 模式被包装以支持重复移动。Blink 的表描述插入态显式键位；命令行补全另有配置，不能将整张表直接视为命令行映射。`mini-pairs` 已禁用。
 
-[mini-ai.lua](../lua/plugins/editor/mini-ai.lua) 在 `x,o` 模式提供 `a/i`、`an/in`（下一个）、`al/il`（上一个）文本对象前缀，`g[/g]` 在 `n,x,o` 跳到对象左/右边界。自定义对象：`o` 块/条件/循环、`f` 函数、`c` 类、`d` 数字、`e` 大小写词段、`g` 整个缓冲区、`u/U` 函数调用。例如 `dif` 删除函数内部、`yag` 复制整个缓冲区。启动时删除的内置 `an/in` 不妨碍 mini.ai 加载后重新注册。
+[mini-ai.lua](../lua/plugins/editor/mini-ai.lua) 在 `x,o` 模式提供 `a/i`、`an/in`（下一个）、`al/il`（上一个）文本对象前缀，`g[/g]` 在 `n,x,o` 跳到对象左/右边界。自定义对象：`o` 块/条件/循环、`f` 函数、`c` 类、`a` 参数、`d` 数字、`e` 大小写词段、`g` 整个缓冲区、`u/U` 函数调用。例如 `dif` 删除函数内部、`yaa` 复制带分隔符的参数、`yag` 复制整个缓冲区；`ap/ip` 保留 mini.ai 的段落对象。启动时删除的内置 `an/in` 不妨碍 mini.ai 加载后重新注册。Treesitter 交换使用 `<leader>ma/mA` 交换下一个/上一个参数，使用 `<leader>mf/mF` 交换下一个/上一个函数，从而避开通知使用的 `<leader>n` 前缀，也不覆盖原生 `>a` 和 `<a` 缩进组合。
 
 [blink-pairs.lua](../lua/plugins/editor/blink-pairs.lua) 配置 `<C-b>` / `<C-S-b>` 包裹动作以移动闭合 / 开启括号（插入态，并启用命令行映射）；插入态 `<C-b>` 与 Blink 补全文档滚动重叠，实际优先级取决于注册顺序。
 

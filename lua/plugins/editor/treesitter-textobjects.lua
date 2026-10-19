@@ -153,28 +153,28 @@ return {
 				desc = "Previous argument end",
 			}, -- 交换参数 (Argument) 顺序
 			{
-				">a",
+				"<leader>ma",
 				function()
 					TSTextObjectsSwap.swap_next("@parameter.inner")
 				end,
 				desc = "Swap next argument",
 			},
 			{
-				"<a",
+				"<leader>mA",
 				function()
 					TSTextObjectsSwap.swap_previous("@parameter.inner")
 				end,
 				desc = "Swap previous argument",
 			},
 			{
-				">f",
+				"<leader>mf",
 				function()
 					TSTextObjectsSwap.swap_next("@function.outer")
 				end,
 				desc = "Swap next function",
 			},
 			{
-				"<f",
+				"<leader>mF",
 				function()
 					TSTextObjectsSwap.swap_previous("@function.outer")
 				end,
