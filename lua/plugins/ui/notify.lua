@@ -5,9 +5,10 @@ return {
 	dir = vim.env.NVIM_PLUGIN_MODE == "dev" and vim.fn.expand("~/Projects/lib/notify.nvim") or nil,
 	lazy = false,
 	dependencies = { "win.nvim", "animate.nvim" },
+	---@type notify.Options
 	opts = {
-		timeout = 1500,
-		max_width = 0.4,
+		timeout = 2000,
+		max_width = 0.5,
 		min_width = 40,
 		max_height = 0.6,
 		margin = { top = 1, right = 1, bottom = 0 },
