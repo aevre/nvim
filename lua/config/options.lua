@@ -76,10 +76,10 @@ opt.pumheight = 10 -- 补全菜单最大高度
 opt.pumblend = 10 -- 补全菜单透明度
 
 opt.guicursor = {
-	"n-v-c-sm:block-Cursor",
+	"n-v-sm:block-Cursor",
 	"i-ci-ve:ver25-Cursor",
+	"c:ver25-Cursor",
 	"r-cr-o:hor20-Cursor",
-	"t:block-blinkon500-blinkoff500-TermCursor",
 }
 
 -- 布局方案
