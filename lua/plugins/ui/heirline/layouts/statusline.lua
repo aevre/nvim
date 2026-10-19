@@ -38,6 +38,7 @@ return {
 	common.Align,
 	statusline.Profile,
 	statusline.Encoding,
+	statusline.FileSize,
 	statusline.Ruler,
 	statusline.Time,
 }

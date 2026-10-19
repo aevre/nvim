@@ -8,6 +8,7 @@ return {
 			icon = ""
 			icon_hl = "DevIconTerminal"
 		end
+		self.icon = icon
 		if icon_hl then
 			local hl_val = vim.api.nvim_get_hl(0, { name = icon_hl, link = false })
 			self.icon_color = hl_val.fg and string.format("#%06x", hl_val.fg) or nil
