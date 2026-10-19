@@ -18,8 +18,6 @@ local function win(position)
 	}
 end
 
-local float = win("float")
-
 local self_keys = {
 	{
 		"<leader>pu",
@@ -38,33 +36,33 @@ local self_keys = {
 	{
 		"<leader>tf",
 		function()
-			require("terminal").toggle(nil, { win = float })
+			require("terminal").toggle(nil, { win = win("float") })
 		end,
 		desc = "Terminal Float",
 	},
 	{
-		"<leader>tt",
+		"<leader>tk",
 		function()
 			require("terminal").toggle(nil, { win = win("top") })
 		end,
 		desc = "Terminal Top",
 	},
 	{
-		"<leader>tb",
+		"<leader>tj",
 		function()
 			require("terminal").toggle(nil, { win = win("bottom") })
 		end,
 		desc = "Terminal Bottom",
 	},
 	{
-		"<leader>tl",
+		"<leader>th",
 		function()
 			require("terminal").toggle(nil, { win = win("left") })
 		end,
 		desc = "Terminal Left",
 	},
 	{
-		"<leader>tr",
+		"<leader>tl",
 		function()
 			require("terminal").toggle(nil, { win = win("right") })
 		end,
@@ -73,7 +71,7 @@ local self_keys = {
 	{
 		"<leader>tm",
 		function()
-			require("terminal").toggle("rmpc", { win = float })
+			require("terminal").toggle("rmpc", { win = win("float") })
 		end,
 		desc = "Music Player",
 		silent = true,
