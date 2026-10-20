@@ -35,7 +35,7 @@ function M.get(palette, opts)
 	local err_color = diag.error or palette.red or "#ff5555"
 	local warn_color = diag.warn or palette.yellow or palette.orange or "#ffb86c"
 	local info_color = diag.info or palette.primary or palette.blue or "#8be9fd"
-	local debug_color = palette.comment or palette.fg_muted or "#6272a4"
+	local debug_color = diag.hint or palette.green or palette.comment or "#6272a4"
 	local trace_color = palette.purple or "#bd93f9"
 
 	return {
