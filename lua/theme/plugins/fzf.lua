@@ -19,7 +19,7 @@ function M.get(palette, opts)
 		FzfLuaPreviewTitle = { fg = border_fg, bg = float_bg, bold = true },
 		FzfLuaBackdrop = { bg = palette.bg_deep or palette.bg },
 		FzfLuaCursor = "IncSearch",
-		FzfLuaFzfCursorLine = { fg = primary_bright, bg = palette.selection or palette.bg_highlight, bold = true },
+		FzfLuaFzfCursorLine = { fg = palette.fg, bg = palette.bg_search or palette.selection, bold = true },
 		FzfLuaFzfPointer = { fg = primary_bright, bold = true },
 		FzfLuaFzfSeparator = { fg = palette.peach or palette.yellow, bg = float_bg },
 		FzfLuaFzfNormal = { fg = palette.fg },
