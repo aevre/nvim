@@ -22,7 +22,7 @@ return {
 			optionsTextColor = { fg = "Function" },
 			searchingActiveBorderColor = { fg = "MatchParen", bold = true },
 			selectedLineBgColor = { bg = "Visual" },
-			unstagedChangesColor = { fg = "DiagnosticError" },
+			unstagedChangesColor = { fg = "diffRemoved" },
 		},
 		win = {},
 	},

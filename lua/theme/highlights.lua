@@ -186,6 +186,10 @@ function M.setup(palette, transparent)
 	for name, opts in pairs(groups) do
 		vim.api.nvim_set_hl(0, name, opts)
 	end
+
+	vim.g.terminal_color_1 = palette.git.delete
+	vim.g.terminal_color_2 = palette.git.add
+	vim.g.terminal_color_3 = palette.git.change
 end
 
 return M
