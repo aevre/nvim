@@ -28,8 +28,8 @@ return {
       dashboard.button("g", "  Find Text",        "<cmd>lua Fzflua.live_grep_native()<cr>"),
       dashboard.button("r", "  Recent Files",     "<cmd>lua Fzflua.oldfiles()<cr>"),
       dashboard.button("c", "  Config",           "<cmd>lua Fzflua.files({ cwd = vim.fn.stdpath('config') })<cr>"),
-      dashboard.button("s", "  Restore Session",  "<cmd>lua require('persistence').load()<cr>"),
-      dashboard.button("S", "󰙰  Select Session",   "<cmd>lua require('persistence').select()<cr>"),
+      dashboard.button("s", "  Restore Session",  "<cmd>lua require('session').load()<cr>"),
+      dashboard.button("S", "󰙰  Select Session",   "<cmd>lua require('session').select()<cr>"),
       dashboard.button("L", "󰒲  Lazy",             "<cmd>Lazy<cr>"),
       dashboard.button("q", "  Quit",             "<cmd>qa<cr>"),
     }
