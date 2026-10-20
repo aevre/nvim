@@ -34,6 +34,13 @@ local self_keys = {
 		desc = "Lazygit",
 	},
 	{
+		"<leader>ts",
+		function()
+			require("terminal").select()
+		end,
+		desc = "Select Terminal",
+	},
+	{
 		"<leader>tf",
 		function()
 			require("terminal").toggle(nil, { win = win("float") })
