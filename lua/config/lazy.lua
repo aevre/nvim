@@ -37,6 +37,14 @@ function M.setup(extra_plugins)
 		},
 	}
 
+	vim.api.nvim_create_autocmd("User", {
+		group = vim.api.nvim_create_augroup("theme_after_lazy", { clear = true }),
+		pattern = { "LazyDone", "LazyInstall", "LazyUpdate" },
+		callback = function()
+			require("theme").apply()
+		end,
+	})
+
 	require("lazy").setup(opts)
 	Utils.keymap.add({ { "<leader>L", "<cmd>Lazy<cr>", desc = "Lazy" } })
 end
