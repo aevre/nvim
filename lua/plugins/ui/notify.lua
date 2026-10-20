@@ -24,7 +24,7 @@ return {
 		style = "default",
 		icons = {},
 		lsp_progress = true,
-		debug = true,
+		debug = vim.env.NVIM_PLUGIN_MODE == "dev",
 		routes = {
 			-- Route write confirmations to Fidget; Vim regex, case-insensitive.
 			{ match = { exact = { "notify" }, message = { [[\v\c(written|已写入)]] } }, to = "fidget" },
