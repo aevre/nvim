@@ -3,6 +3,7 @@
 return {
 	"folke/persistence.nvim",
 	event = "BufReadPre",
+	enabled = false,
 	opts = {
 		need = 1,
 		branch = true,

@@ -146,6 +146,18 @@ return {
 			},
 		})
 
+		vim.api.nvim_create_autocmd("User", {
+			pattern = "OilEnter",
+			callback = function()
+				for index = vim.fn.argc() - 1, 0, -1 do
+					local arg = vim.fn.argv(index)
+					if vim.fn.isdirectory(arg) == 1 or vim.startswith(arg, "oil://") then
+						vim.cmd((index + 1) .. "argdelete")
+					end
+				end
+			end,
+		})
+
 		require("oil").setup(opts)
 	end,
 }
