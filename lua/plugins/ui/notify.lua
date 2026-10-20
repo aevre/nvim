@@ -24,6 +24,14 @@ return {
 		style = "default",
 		icons = {},
 		lsp_progress = true,
+		debug = true,
+		routes = {
+			-- Route write confirmations to Fidget; Vim regex, case-insensitive.
+			{ match = { exact = { "notify" }, message = { [[\v\c(written|已写入)]] } }, to = "fidget" },
+			-- Keep other vim.notify() messages in the regular notification backend.
+			{ match = { exact = { "notify" } }, to = "notify" },
+			{ match = { prefix = { "msg.show." } }, to = "notify" },
+		},
 		fidget = {
 			max_queue = 5,
 			margin_left = 1,
