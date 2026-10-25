@@ -36,19 +36,52 @@ return {
 		},
 		config = function()
 			local mr = require("mason-registry")
-			mr.refresh(function()
-				for _, tool in ipairs(require("toolchain").get_mason_packages()) do
+
+			local function install(filetype)
+				local pending = 0
+				local function ready()
+					if pending > 0 then
+						return
+					end
+					vim.schedule(function()
+						require("toolchain").lang.enable_for_open_buffers()
+						vim.api.nvim_exec_autocmds("User", { pattern = "ToolchainReady" })
+					end)
+				end
+
+				for _, tool in ipairs(require("toolchain").get_mason_packages(filetype)) do
 					if mr.has_package(tool) then
-						local p = mr.get_package(tool)
-						if not p:is_installed() and not p:is_installing() then
-							p:install(nil, function(success)
-								if success then
-									vim.schedule(require("toolchain").lang.enable_for_open_buffers)
-								end
+						local package = mr.get_package(tool)
+						if not package:is_installed() and not package:is_installing() then
+							pending = pending + 1
+							package:install(nil, function()
+								pending = pending - 1
+								ready()
 							end)
 						end
 					else
 						vim.notify(("Mason package not found: %s"):format(tool), vim.log.levels.WARN)
+					end
+				end
+				ready()
+			end
+
+			local function install_buffer(bufnr)
+				if vim.bo[bufnr].buftype == "" and vim.api.nvim_buf_get_name(bufnr) ~= "" then
+					install(vim.bo[bufnr].filetype)
+				end
+			end
+
+			mr.refresh(function()
+				vim.api.nvim_create_autocmd("FileType", {
+					group = vim.api.nvim_create_augroup("MasonInstallByFiletype", { clear = true }),
+					callback = function(event)
+						install_buffer(event.buf)
+					end,
+				})
+				for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+					if vim.api.nvim_buf_is_loaded(bufnr) then
+						install_buffer(bufnr)
 					end
 				end
 			end)

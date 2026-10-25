@@ -19,20 +19,19 @@ local function start_treesitter(buf)
 		return true
 	end
 
+	local filetype = vim.bo[buf].filetype
+	local parser = vim.treesitter.language.get_lang(filetype) or filetype
+	local available, load_err = pcall(vim.treesitter.language.inspect, parser)
+	if not available then
+		return false, load_err
+	end
+
 	local ok, err = pcall(vim.treesitter.start, buf)
 	if not ok then
 		return false, err
 	end
 
 	vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-	for _, win in ipairs(vim.fn.win_findbuf(buf)) do
-		if vim.api.nvim_win_is_valid(win) then
-			vim.api.nvim_set_option_value("foldexpr", "v:lua.vim.treesitter.foldexpr()", { win = win })
-			vim.api.nvim_set_option_value("foldmethod", "expr", {
-				win = win,
-			})
-		end
-	end
 	return true
 end
 
@@ -51,65 +50,44 @@ local function notify_failure(parser, err)
 end
 
 ---@param buf integer
----@return string
-local function request_install(buf)
+local function install_and_start(buf)
 	local filetype = vim.bo[buf].filetype
 	local root_parser = vim.treesitter.language.get_lang(filetype) or filetype
-
 	local definition = toolchain.get_language_by_filetype(filetype)
-	local parsers = definition and definition.treesitter
+	local parsers = definition and definition.treesitter or { root_parser }
+	local key = table.concat(parsers, ",")
 
-	if not parsers or #parsers == 0 then
-		parsers = { root_parser }
+	if installing[key] then
+		installing[key][#installing[key] + 1] = buf
+		return
 	end
-
-	local pending = {}
-
-	for _, parser in ipairs(parsers) do
-		if not installing[parser] then
-			installing[parser] = true
-			pending[#pending + 1] = parser
-		end
-	end
-
-	if #pending == 0 then
-		return root_parser
-	end
+	installing[key] = { buf }
 
 	local ok, treesitter = pcall(require, "nvim-treesitter")
 	if not ok then
-		for _, parser in ipairs(pending) do
-			installing[parser] = nil
-		end
-		return root_parser
-	end
-
-	local installed, err = pcall(treesitter.install, pending, { summary = false })
-	if not installed then
-		for _, parser in ipairs(pending) do
-			installing[parser] = nil
-			notify_failure(root_parser, err)
-		end
-	end
-	return root_parser
-end
-
----@param buf integer
----@param attempts integer
-local function start_when_ready(buf, attempts)
-	local ok, err = start_treesitter(buf)
-	if ok then
+		installing[key] = nil
+		notify_failure(root_parser, treesitter)
 		return
 	end
 
-	local parser = request_install(buf)
-	if attempts >= 300 then
-		notify_failure(parser, err)
-		return
-	end
-	vim.defer_fn(function()
-		start_when_ready(buf, attempts + 1)
-	end, 100)
+	local task = treesitter.install(parsers, { summary = false })
+	task:await(function(err, success)
+		local buffers = installing[key] or {}
+		installing[key] = nil
+		vim.schedule(function()
+			if err or not success then
+				notify_failure(root_parser, err or "installation failed")
+				return
+			end
+
+			for _, bufnr in ipairs(buffers) do
+				local started, start_err = start_treesitter(bufnr)
+				if not started then
+					notify_failure(root_parser, start_err)
+				end
+			end
+		end)
+	end)
 end
 
 ---@type LazyPluginSpec
@@ -128,7 +106,7 @@ return {
 			group = group,
 			pattern = filetypes,
 			callback = function(event)
-				start_when_ready(event.buf, 0)
+				install_and_start(event.buf)
 			end,
 		})
 	end,

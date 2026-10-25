@@ -26,6 +26,15 @@ return {
 		lsp_progress = true,
 		debug = vim.env.NVIM_PLUGIN_MODE == "dev",
 		routes = {
+			{
+				match = {
+					exact = { "notify" },
+					message = {
+						[[\v^\[nvim-treesitter/install/.+\]: (Downloading .+|Compiling parser|Installing parser|Language installed)$]],
+					},
+				},
+				to = "treesitter-progress",
+			},
 			{ match = { exact = { "notify" }, message = { [[\vsaved .*]] } }, to = "fidget" },
 			-- Route write confirmations to Fidget; Vim regex, case-insensitive.
 			{ match = { exact = { "notify" }, message = { [[\v\c(written|已写入)]] } }, to = "fidget" },
@@ -43,4 +52,28 @@ return {
 			spinner_interval = 200,
 		},
 	},
+	config = function(_, opts)
+		local notify = require("notify")
+		notify.setup(opts)
+		notify.unsubscribe("treesitter-install-progress")
+		notify.subscribe(
+			"treesitter-install-progress",
+			{
+				exact = { "notify" },
+				message = {
+					[[\v^\[nvim-treesitter/install/.+\]: (Downloading .+|Compiling parser|Installing parser|Language installed)$]],
+				},
+			},
+			vim.log.levels.INFO,
+			function(event)
+				local parser, status = event.content:match("^%[nvim%-treesitter/install/([^%]]+)%]: (.+)$")
+				local token = "treesitter-install:" .. parser
+				if status == "Language installed" then
+					notify.fidget.finish(token, status)
+				else
+					notify.fidget.send("Treesitter: " .. parser, status, { token = token, spinner = true })
+				end
+			end
+		)
+	end,
 }

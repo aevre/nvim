@@ -4,6 +4,7 @@ local M = {}
 local packages = {
 	-- LSP
 	["bash-language-server"] = "bash-language-server",
+	["bacon-ls"] = "bacon-ls",
 	["clangd"] = "clangd",
 	["css-lsp"] = "css-lsp",
 	["css-variables-language-server"] = "css-variables-language-server",
@@ -51,21 +52,6 @@ local packages = {
 	["golangcilint"] = "golangci-lint",
 }
 
-local extra_packages = {
-	"codelldb",
-	"delve",
-	"java-debug-adapter",
-	"js-debug-adapter",
-	"bacon-ls",
-	"gomodifytags",
-	"impl",
-	"java-test",
-	"tree-sitter-cli",
-	"ktlint",
-	"sqlfluff",
-	"codespell",
-}
-
 local function add(result, seen, name)
 	local package = packages[name]
 	if package and not seen[package] then
@@ -85,32 +71,19 @@ function M.is_installed(name)
 	return ok and registry.has_package(package) and registry.get_package(package):is_installed()
 end
 
+---@param filetype string
 ---@return string[]
-function M.get_packages()
+function M.get_packages(filetype)
 	local result = {}
 	local seen = {}
-	local toolchain = require("toolchain")
-
-	for _, definition in pairs(toolchain.lang.get()) do
-		for _, name in ipairs(definition.lsp or {}) do
-			add(result, seen, name)
-		end
+	local definition = require("toolchain").lang.get_by_filetype(filetype)
+	if not definition then
+		return result
 	end
 
-	for _, formatters in pairs(toolchain.get_formatters()) do
-		for _, name in ipairs(formatters) do
+	for _, field in ipairs({ "lsp", "formatters", "linters" }) do
+		for _, name in ipairs(definition[field] or {}) do
 			add(result, seen, name)
-		end
-	end
-	for _, linters in pairs(toolchain.get_linters()) do
-		for _, name in ipairs(linters) do
-			add(result, seen, name)
-		end
-	end
-	for _, package in ipairs(extra_packages) do
-		if not seen[package] then
-			seen[package] = true
-			result[#result + 1] = package
 		end
 	end
 

@@ -79,8 +79,11 @@ return {
 				local linter = lint.linters[name]
 				if not linter then
 					Utils.log.info("Linter not found: " .. name, { title = "linter" })
+					return false
 				end
-				return linter and not (type(linter) == "table" and linter.condition and not linter.condition(ctx))
+				local cmd = type(linter.cmd) == "function" and linter.cmd() or linter.cmd
+				return (not cmd or vim.fn.executable(cmd) == 1)
+					and not (type(linter) == "table" and linter.condition and not linter.condition(ctx))
 			end, names)
 
 			if #names > 0 then
@@ -88,9 +91,21 @@ return {
 			end
 		end
 
+		local group = vim.api.nvim_create_augroup("nvim-lint", { clear = true })
 		vim.api.nvim_create_autocmd(opts.events, {
-			group = vim.api.nvim_create_augroup("nvim-lint", { clear = true }),
+			group = group,
 			callback = M.debounce(100, M.lint),
+		})
+		vim.api.nvim_create_autocmd("User", {
+			group = group,
+			pattern = "ToolchainReady",
+			callback = function()
+				for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+					if vim.api.nvim_buf_is_loaded(bufnr) then
+						vim.api.nvim_buf_call(bufnr, M.lint)
+					end
+				end
+			end,
 		})
 	end,
 }

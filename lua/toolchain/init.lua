@@ -34,8 +34,9 @@ function M.get_language_by_filetype(filetype)
 	return M.lang.get_by_filetype(filetype)
 end
 
-function M.get_mason_packages()
-	return M.mason.get_packages()
+---@param filetype string
+function M.get_mason_packages(filetype)
+	return M.mason.get_packages(filetype)
 end
 
 return M
