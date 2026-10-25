@@ -1,6 +1,6 @@
 ---@type LazyPluginSpec
 return {
-	"https://codeberg.org/aevre/session.nvim",
+	"aevre/session.nvim",
 	name = "session.nvim",
 	dir = vim.env.NVIM_PLUGIN_MODE == "dev" and vim.fn.expand("~/Projects/lib/session.nvim") or nil,
 	event = "BufReadPre",

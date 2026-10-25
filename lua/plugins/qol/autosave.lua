@@ -1,6 +1,6 @@
 ---@type LazyPluginSpec
 return {
-	"https://codeberg.org/aevre/autosave.nvim",
+	"aevre/autosave.nvim",
 	name = "autosave.nvim",
 	dir = vim.env.NVIM_PLUGIN_MODE == "dev" and vim.fn.expand("~/Projects/lib/autosave.nvim") or nil,
 	event = { "BufReadPost", "BufNewFile", "BufWritePre" },

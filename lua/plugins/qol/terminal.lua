@@ -1,6 +1,6 @@
 ---@type LazyPluginSpec
 return {
-	"https://codeberg.org/aevre/terminal.nvim",
+	"aevre/terminal.nvim",
 	name = "terminal.nvim",
 	dir = vim.env.NVIM_PLUGIN_MODE == "dev" and vim.fn.expand("~/Projects/lib/terminal.nvim") or nil,
 	lazy = false,

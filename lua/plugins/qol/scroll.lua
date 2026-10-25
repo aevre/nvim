@@ -1,6 +1,6 @@
 ---@type LazyPluginSpec
 return {
-	"https://codeberg.org/aevre/scroll.nvim",
+	"aevre/scroll.nvim",
 	name = "scroll.nvim",
 	dir = vim.env.NVIM_PLUGIN_MODE == "dev" and vim.fn.expand("~/Projects/lib/scroll.nvim") or nil,
 	event = "UIEnter",

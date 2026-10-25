@@ -1,6 +1,6 @@
 ---@type LazyPluginSpec
 return {
-	"https://codeberg.org/aevre/cmdline.nvim",
+	"aevre/cmdline.nvim",
 	-- enabled = false,
 	name = "cmdline.nvim",
 	dir = vim.env.NVIM_PLUGIN_MODE == "dev" and vim.fn.expand("~/Projects/lib/cmdline.nvim") or nil,

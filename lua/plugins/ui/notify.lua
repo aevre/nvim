@@ -1,6 +1,6 @@
 ---@type LazyPluginSpec
 return {
-	"https://codeberg.org/aevre/notify.nvim",
+	"aevre/notify.nvim",
 	name = "notify.nvim",
 	dir = vim.env.NVIM_PLUGIN_MODE == "dev" and vim.fn.expand("~/Projects/lib/notify.nvim") or nil,
 	lazy = false,
