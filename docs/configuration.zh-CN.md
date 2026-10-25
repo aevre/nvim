@@ -19,15 +19,17 @@ Lazy 导入 `plugins` 以及 `coding`、`colorschemes`、`deps`、`editor`、`hi
 | 格式化与检查 | Conform、nvim-lint 在 `BufEdit` 加载，工具关联由 toolchain 提供 |
 | Git | mini.git 与 mini.diff 在 `BufEdit` 加载；CodeDiff 通过命令/快捷键加载；Lazygit 使用本地终端封装 |
 | 大纲与注释 | Aerial 通过 `<leader>cs` 加载；Neogen 通过命令/快捷键加载 |
-| 会话 | persistence.nvim 在 `BufReadPre` 加载；恢复与选择会话有独立快捷键 |
+| 会话 | session.nvim 在 `BufReadPre` 加载；启用自动保存，关闭自动恢复与切换会话时保存；提供恢复、选择和手动保存键位 |
 | 搜索替换 | grug-far 通过命令/快捷键加载 |
 | UI | Alpha 在 `VimEnter`，Heirline 在 `UIEnter`；Incline、缩进线、Treesitter context 在 `BufEdit` |
-| 消息与诊断 | Noice 启动加载并负责命令行与消息界面，notify.nvim 接管 `vim.notify`；tiny-inline-diagnostic 在 `LspAttach` 加载并关闭原生 virtual text |
+| 消息与诊断 | cmdline.nvim 与 notify.nvim 启动加载，负责命令行/消息界面与通知；notify.nvim 同时处理 LSP 进度；tiny-inline-diagnostic 在 `LspAttach` 加载并关闭原生 virtual text |
 | 其他 | Which-key 在 `VeryLazy`，Yanky 和 Screenkey 由键位触发；WakaTime 在 `BufEdit` |
 | HTTP | nvim-http-client 通过 `VeryLazy`、`http/rest` 或快捷键加载；向上查找 `http-client.env.json` |
 | AI | Minuet 与 llm.nvim 均配置为 `BufEdit` 加载；Minuet 也是 blink.cmp 的依赖 |
 
-明确禁用的 spec：refactoring.nvim、mini.pairs、rainbow-delimiters.nvim、tiny-cmdline.nvim、transparent.nvim、mini.clue、neoscroll.nvim、snacks.nvim、treesitter-parser-registry。`lspconfig.lua` 返回空表，当前不使用 nvim-lspconfig 插件配置 LSP。透明效果来自本地主题模块，与禁用的 transparent.nvim 无关。
+明确禁用的 spec：persistence.nvim、noice.nvim、nvim-notify、refactoring.nvim、mini.pairs、rainbow-delimiters.nvim、tiny-cmdline.nvim、transparent.nvim、mini.clue、neoscroll.nvim、snacks.nvim、treesitter-parser-registry。`lspconfig.lua` 返回空表，当前不使用 nvim-lspconfig 插件配置 LSP。透明效果来自本地主题模块，与禁用的 transparent.nvim 无关。
+
+cmdline.nvim 启用命令行弹窗、消息/搜索通知视图和 NUI popup menu。notify.nvim 将匹配 `saved …`、`written` 或 `已写入` 的保存确认路由到内置 Fidget 视图，其余 `vim.notify()` 与 `msg.show.*` 消息进入常规通知。`<leader>n` 查看通知历史，`<leader>fn` 查看 Fidget 历史。`NVIM_PLUGIN_MODE=dev` 还会启用 notify.nvim 的调试输出。
 
 ## 工具链的实际行为
 
@@ -64,7 +66,9 @@ Minuet 和 llm.nvim 当前模型为 `cohere/north-mini-code:free`；模型是否
 
 ## 文件类型与主题
 
-`after/ftplugin/` 为 Vue、Oil、mini.files 提供补充行为。本地 LuaSnip 文件为 `snippets/vue/vue.lua`；片段可用性还取决于 LuaSnip 和 friendly-snippets 的加载。
+`after/ftplugin/` 为 Vue、Oil、mini.files 提供补充行为。本地 LuaSnip 文件为 `snippets/go/go.lua`、`snippets/java/java.lua` 和 `snippets/vue/vue.lua`；片段可用性还取决于 LuaSnip 和 friendly-snippets 的加载。
+
+`lua/config/filetype.lua` 为 Shell dotfile、Git 配置文件、`Taskfile`、`Brewfile` 等列出的文件名补充类型检测，同时识别对应的 `.tmpl` 和 chezmoi 前缀变体，例如 `dot_zshrc`、`private_dot_zshrc.tmpl`。
 
 自动命令将 `*.env` / `.env.*` 设为 `sh`，`*.ejs` / `*.ejs.t` 设为 `embedded_template`，`*.code-snippets` 设为 `json`。JSON/JSONC 不隐藏文本；多个特殊窗口注册 `q` 关闭并从 buffer 列表隐藏。`FileType` 时移除 `formatoptions` 的 `c/r/o`，关闭注释自动排版和续写。
 

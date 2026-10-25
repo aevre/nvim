@@ -67,7 +67,7 @@ blink.cmp 配置包含原生组件构建步骤；如构建失败，在 `:Lazy` �
 | `<leader>L` / `<leader>cm` | Lazy / Mason |
 | `<leader>?` | 当前 buffer 的快捷键提示 |
 
-配置启用自动保存插件，在 `InsertLeave`、`TextChanged` 时按条件保存；**没有配置 Conform 保存时自动格式化**。默认两空格缩进、相对行号、持久化撤销；SSH 环境下关闭 `unnamedplus` 系统剪贴板联动。
+autosave.nvim 使用 1000ms 延迟，关闭保存通知，并排除 Oil buffer；**没有配置 Conform 保存时自动格式化**。默认两空格缩进、相对行号、持久化撤销；SSH 环境下关闭 `unnamedplus` 系统剪贴板联动。
 
 ## 目录
 
@@ -77,18 +77,17 @@ lua/config/                选项、自动命令、全局键位、LSP、插件�
 lua/plugins/               按功能分组的 lazy.nvim spec 与插件内部模块
 lua/toolchain/             语言规格、工具条件、Mason 名称映射
 lsp/                       原生 LSP 的命令、根目录与 settings
-lua/builtin/               本地 buffer 工具
 lua/theme/                 调色板、高亮与透明背景
 palette.json               当前主题的 JSON 覆盖值
 lua/sources/               fzf 的语言、LSP、通知、图标数据源
 lua/utils/                 共享工具函数
-snippets/                  本地 LuaSnip 片段（当前为 Vue）
+snippets/                  Go、Java、Vue 的本地 LuaSnip 片段
 after/ftplugin/            Vue、Oil、mini.files 的文件类型补充
 docs/                      中英文参考文档
 lazy-lock.json             插件版本锁定
 ```
 
-启动顺序为主题 → options → autocmds → keymaps → LSP/toolchain → lazy.nvim 引导 → 自定义事件 → 插件管理器。`BufEdit` 是本配置定义的 Lazy 事件别名，覆盖 `BufReadPost`、`BufNewFile`、`BufWritePre`。
+启动顺序为主题 → options → 文件类型检测 → autocmds → keymaps → LSP/toolchain → lazy.nvim 引导 → 自定义事件 → 插件管理器。`BufEdit` 是本配置定义的 Lazy 事件别名，覆盖 `BufReadPost`、`BufNewFile`、`BufWritePre`。
 
 ## 修改配置
 
@@ -97,6 +96,6 @@ lazy-lock.json             插件版本锁定
 - 添加或调整语言：[工具链文档](docs/toolchain.zh-CN.md)，使用 `<leader>cL` 直接打开规格。
 - LSP 参数：[lsp/](lsp/)。文件存在不代表已启用，还需语言规格声明、安装与根目录条件满足。
 - 主题：[lua/theme/](lua/theme/) 和 [palette.json](palette.json)。当前入口直接应用本地主题，没有调用 `colorscheme tokyonight`；`:TransparentToggle` 切换并持久化透明状态。
-- 自有插件本地开发：设置 `NVIM_PLUGIN_MODE=dev`，即可从 `~/Projects/lib` 加载 `win`、`animate`、`scroll`、`terminal`、`lazygit`、`notify` 六个插件；未设置或使用其他值时从 Codeberg 加载。`NVIM_DEV_DIR` 仍是 Lazy 独立的通用本地插件匹配设置。
+- 自有插件本地开发：设置 `NVIM_PLUGIN_MODE=dev`，即可从 `~/Projects/lib` 加载 `win`、`animate`、`scroll`、`terminal`、`lazygit`、`notify`、`cmdline`、`autosave`、`session` 九个插件；未设置或使用其他值时从 Codeberg 加载。`NVIM_DEV_DIR` 仍是 Lazy 独立的通用本地插件匹配设置。
 
 更新插件使用 `:Lazy update`；如需按已提交的锁文件恢复版本，使用 `:Lazy restore`。`<leader>pu` 调用的是 Neovim 原生 `vim.pack.update()`，不等于更新 Lazy 管理的插件。

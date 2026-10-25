@@ -90,7 +90,7 @@ lsp/ruff.lua
 
 Language specifications only decide which languages use an LSP; modify the corresponding `lsp/<name>.lua` file when changing LSP implementation details.
 
-Neovim configuration Lua uses `lua_ls`. Its `vim` global, Neovim runtime, configuration directory, and LuaJIT environment are written in `.luarc.json` at the configuration root; do not copy these workspace library settings into `lsp/lua_ls.lua`. The latter only declares the startup command, filetypes, and project root markers.
+Neovim configuration Lua uses `lua_ls`. `.luarc.json` at the configuration root provides project settings such as globals and the LuaJIT environment. `lsp/lua_ls.lua` declares the startup command, filetypes, and root markers, and dynamically supplies workspace libraries from installed plugins' `lua` directories, the luv library, and `VIMRUNTIME`.
 
 ## Tool Specifications
 
@@ -133,7 +133,9 @@ lua/toolchain/tool/specs/biome.lua
 lua/toolchain/tool/specs/oxfmt.lua
 ```
 
-When changing tool configuration file detection rules, modify only the corresponding tool specification. Do not write the condition logic back into `lua/plugins/formatter.lua`.
+Configuration detection searches upward from the current file's directory, with the home directory as the stop boundary, and only recognizes the filenames listed in each tool spec. It does not inspect `package.json` fields; unlisted names such as `.prettierrc.cjs` or `eslint.config.ts` are not recognized. An unrecognized Prettier configuration therefore does not prevent Oxfmt's fallback.
+
+When changing CLI formatter configuration file detection rules, modify the corresponding tool specification. Do not write the condition logic back into `lua/plugins/formatter.lua`.
 
 Linters follow the same rules. `linters` in a language specification only declares which linters the language uses; `linter.condition` in a tool specification decides whether that linter is enabled in the current project. The condition is executed by this configuration's linter callback based on the current file path before calling `lint.try_lint()`.
 
@@ -151,6 +153,8 @@ lua/toolchain/tool/specs/oxlint.lua
 
 When changing linter configuration file detection rules, modify only the corresponding tool specification. Do not write the condition logic back into `lua/plugins/linter.lua`. The latter is responsible for merging configuration, filtering tools, and triggering linting.
 
+These conditions apply to CLI formatters and linters. Same-named LSPs have separate root/configuration rules in `lsp/<name>.lua`; update those files too when changing both behaviors. For example, Oxlint LSP recognizes `oxlint.config.ts`, while the CLI condition only recognizes `.oxlintrc.json`; Oxfmt LSP does not share the formatter's no-configuration fallback.
+
 Conform still uses the default behavior of the formatter list: if multiple formatter conditions are satisfied and `stop_after_first = true` is not set when calling it, Conform may execute multiple formatters in sequence. Tool specifications only decide whether a tool is available; they do not change this execution strategy.
 
 Whether a formatter is installed is determined by the Mason package list, while whether a formatter is effective for the current project is determined by Conform's `condition`; these two decisions are independent. A formatter declared by a language specification does not mean that it will run in every project.
@@ -159,7 +163,7 @@ GraphQL and Handlebars currently have no formatter mapping. Luau uses `stylua` t
 
 ## Current Language List
 
-The table below lists the formatter, CLI linter, and LSP declarations in the specifications; declarations remain subject to tool availability, the service's own filetype/root requirements, and installation conditions. The Web formatting combination means `prettier → biome → oxfmt`.
+The table below lists the Conform formatter, CLI linter, and LSP declarations in the specifications; `—` in the formatter column means no Conform mapping. Manual formatting can still fall back to an attached LSP that supports formatting. These declarations remain subject to tool availability, the service's own filetype/root requirements, and installation conditions. The Web formatting combination means `prettier → biome → oxfmt`.
 
 | Specification / filetype | Formatter | CLI linter | LSP |
 | --- | --- | --- | --- |
@@ -213,7 +217,8 @@ Using the addition of Zig as an example:
 3. Add `formatters`, `linters`, `lsp`, and `treesitter` as needed.
 4. If the LSP name has no corresponding `lsp/<name>.lua`, create that file.
 5. If the tool needs a configuration file condition, add or modify the corresponding tool specification in `toolchain/tool/specs/`.
-6. Open a file in that language and verify LSP, formatting, linting, and Treesitter behavior.
+6. For tools that Mason should install automatically, add explicit name mappings in `lua/toolchain/mason.lua`, even when the runtime and package names are identical.
+7. Open a file in that language and verify LSP, formatting, linting, and Treesitter behavior.
 
 Adding a language does not require modifying the language list or manually adding an fzf source; `<leader>cL` automatically displays the new language specification.
 
@@ -240,11 +245,13 @@ The Mason registry callback at the `VeryLazy` stage calls `toolchain.get_mason_p
 | `golangcilint` | `golangci-lint` |
 | `ruff_format` | `ruff` |
 
-Name mappings are located in `lua/toolchain/mason.lua`. When adding an LSP, formatter, or linter, if it does not use the same Mason package name, add it to this mapping; otherwise it will continue to be used by the configuration, but Mason will not install it automatically.
+Name mappings are located in `lua/toolchain/mason.lua`. Every LSP, formatter, or linter that Mason should install automatically needs an explicit entry in this mapping, even when its runtime name matches the Mason package name. Unmapped tools are still declared for use, but are not added to the automatic installation list unless listed in `extra_packages`.
 
 Debug adapters and general auxiliary tools remain maintained in `extra_packages` and are not removed because the current language is not open. When a Mason registry refresh fails or a package does not exist, Mason itself reports the installation failure; this does not prevent language specifications from loading.
 
 LSPs are enabled by `FileType`: when a name mapping exists, the package must first be installed in Mason; without a mapping, `is_installed()` directly returns true, after which availability still depends on whether the command is executable. After installation succeeds, already-open buffers' services are retried. `dartls` has no Mason mapping and requires the Dart SDK; `rustfmt` is also unmapped and should be prepared separately. ESLint has no package name mapping, so CLI linting requires the project or PATH to provide it. `bacon-ls` has no name mapping but is included in the extra installation list. The zsh filetype shares the `bash-language-server` package mapping with bash.
+
+Language filetypes trigger the first `vim.lsp.enable(name)` call; the server is then enabled globally. Its own filetypes and root rules determine later attachments. For example, opening Go first enables gopls, which can then attach to `gomod`, `gowork`, and `gotmpl` buffers even though those types are not in the Go language specification.
 
 `lsp/emmylua.lua`, `lsp/nushell.lua`, and `lsp/stylua.lua` are not currently enabled by language specifications. Java declares `jdtls`, whose configuration is only `cmd = "jdtls"`; it has no project workspace or debugging integration.
 
@@ -268,7 +275,7 @@ nvim --headless -u NONE \
 
 ## Relationship with Other Modules
 
-- `lua/config/lsp.lua` calls `toolchain.setup()` and handles LSP buffer attachment, progress events, and keymaps.
+- `lua/config/lsp.lua` calls `toolchain.setup()` and handles LSP buffer attachment, diagnostics, keymaps, and supported hint features.
 - `lua/plugins/formatter.lua` uses the formatter aggregate results and tool conditions; it currently configures only manual formatting.
 - `lua/plugins/linter.lua` uses the linter aggregate results and triggers linting when reading files, writing files, and leaving insert mode.
 - `lua/plugins/highlight/treesitter.lua` uses the parser aggregate results and triggers installation and retries when a parser is missing.

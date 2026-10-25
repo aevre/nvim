@@ -19,15 +19,17 @@ Lazy imports `plugins` and the `coding`, `colorschemes`, `deps`, `editor`, `high
 | Formatting and linting | Conform and nvim-lint load on `BufEdit`, with tool associations supplied by toolchain |
 | Git | mini.git and mini.diff load on `BufEdit`; CodeDiff loads through commands/keymaps; Lazygit uses a local terminal wrapper |
 | Outline and documentation comments | Aerial loads through `<leader>cs`; Neogen loads through commands/keymaps |
-| Sessions | persistence.nvim loads on `BufReadPre`; separate keymaps restore and select sessions |
+| Sessions | session.nvim loads on `BufReadPre`; autosave is enabled, automatic restoration and saving on session switch are disabled; keymaps restore, select, or save sessions |
 | Search and replace | grug-far loads through commands/keymaps |
 | UI | Alpha loads on `VimEnter`, Heirline on `UIEnter`; Incline, indent guides, and Treesitter context load on `BufEdit` |
-| Messages and diagnostics | Noice loads at startup for command-line and message UI, notify.nvim owns `vim.notify`; tiny-inline-diagnostic loads on `LspAttach` and disables native virtual text |
+| Messages and diagnostics | cmdline.nvim and notify.nvim load at startup for command-line/message UI and notifications; notify.nvim also handles LSP progress; tiny-inline-diagnostic loads on `LspAttach` and disables native virtual text |
 | Other | Which-key loads on `VeryLazy`; Yanky and Screenkey are triggered by keymaps; WakaTime loads on `BufEdit` |
 | HTTP | nvim-http-client loads through `VeryLazy`, `http/rest`, or keymaps; it searches upward for `http-client.env.json` |
 | AI | Minuet and llm.nvim are both configured to load on `BufEdit`; Minuet is also a dependency of blink.cmp |
 
-Explicitly disabled specs: refactoring.nvim, mini.pairs, rainbow-delimiters.nvim, tiny-cmdline.nvim, transparent.nvim, mini.clue, neoscroll.nvim, snacks.nvim, and treesitter-parser-registry. `lspconfig.lua` returns an empty table; LSP is currently configured without the nvim-lspconfig plugin. Transparency comes from the local theme module and is unrelated to the disabled transparent.nvim.
+Explicitly disabled specs: persistence.nvim, noice.nvim, nvim-notify, refactoring.nvim, mini.pairs, rainbow-delimiters.nvim, tiny-cmdline.nvim, transparent.nvim, mini.clue, neoscroll.nvim, snacks.nvim, and treesitter-parser-registry. `lspconfig.lua` returns an empty table; LSP is currently configured without the nvim-lspconfig plugin. Transparency comes from the local theme module and is unrelated to the disabled transparent.nvim.
+
+cmdline.nvim enables the command-line popup, message/search notification views, and the NUI popup menu. notify.nvim routes matching save confirmations (`saved …`, `written`, or `已写入`) to its Fidget view; other `vim.notify()` and `msg.show.*` messages go to regular notifications. `<leader>n` opens notification history and `<leader>fn` opens Fidget history. `NVIM_PLUGIN_MODE=dev` also enables notify.nvim debug output.
 
 ## Actual Toolchain Behavior
 
@@ -64,7 +66,9 @@ The current model for Minuet and llm.nvim is `cohere/north-mini-code:free`; its 
 
 ## Filetypes and Theme
 
-`after/ftplugin/` provides additional behavior for Vue, Oil, and mini.files. The local LuaSnip file is `snippets/vue/vue.lua`; snippet availability also depends on LuaSnip and friendly-snippets being loaded.
+`after/ftplugin/` provides additional behavior for Vue, Oil, and mini.files. Local LuaSnip files are `snippets/go/go.lua`, `snippets/java/java.lua`, and `snippets/vue/vue.lua`; snippet availability also depends on LuaSnip and friendly-snippets being loaded.
+
+`lua/config/filetype.lua` extends filename detection for shell dotfiles, Git configuration files, `Taskfile`, `Brewfile`, and other listed names, including their `.tmpl` and chezmoi-prefixed variants (such as `dot_zshrc` and `private_dot_zshrc.tmpl`).
 
 Autocommands set `*.env` / `.env.*` to `sh`, `*.ejs` / `*.ejs.t` to `embedded_template`, and `*.code-snippets` to `json`. JSON/JSONC do not conceal text. Several special windows register `q` to close them and are hidden from the buffer list. On `FileType`, `c/r/o` are removed from `formatoptions`, disabling automatic comment formatting and continuation.
 

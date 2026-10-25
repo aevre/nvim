@@ -103,10 +103,9 @@ lsp/ruff.lua
 语言规格只决定哪些语言使用它；修改 LSP 实现细节时修改对应的
 `lsp/<名称>.lua`。
 
-Neovim 配置中的 Lua 使用 `lua_ls`。它的 `vim` 全局、Neovim runtime、配置
-目录和 LuaJIT 环境写在配置根目录的 `.luarc.json` 中；不要把这些 workspace
-library 设置复制到 `lsp/lua_ls.lua`。后者只负责声明启动命令、filetype 和
-项目根标记。
+Neovim 配置中的 Lua 使用 `lua_ls`。配置根目录的 `.luarc.json` 提供全局变量、
+LuaJIT 环境等项目设置；`lsp/lua_ls.lua` 声明启动命令、filetype 和项目根标记，
+并动态将已安装插件的 `lua` 目录、luv library 和 `VIMRUNTIME` 加入 workspace library。
 
 ## 工具规格
 
@@ -152,7 +151,11 @@ lua/toolchain/tool/specs/biome.lua
 lua/toolchain/tool/specs/oxfmt.lua
 ```
 
-修改工具配置文件探测规则时，只修改对应工具规格，不要把条件逻辑重新写回
+配置探测从当前文件目录向上搜索，以 home 目录为停止边界，只识别各工具规格中
+列出的文件名，不检查 `package.json` 字段；`.prettierrc.cjs`、`eslint.config.ts`
+等未列出的名称不会被识别。因此，未识别的 Prettier 配置也不会阻止 Oxfmt fallback。
+
+修改 CLI formatter 配置文件探测规则时，修改对应工具规格，不要把条件逻辑重新写回
 `lua/plugins/formatter.lua`。
 
 Linter 也遵循相同规则。语言规格中的 `linters` 只声明语言使用哪些 linter，
@@ -174,6 +177,11 @@ lua/toolchain/tool/specs/oxlint.lua
 修改 linter 配置文件探测规则时，只修改对应工具规格，不要把条件逻辑写回
 `lua/plugins/linter.lua`。后者负责合并配置、筛选工具和触发 lint。
 
+这些条件只控制 CLI formatter 和 linter。同名 LSP 在 `lsp/<名称>.lua` 中独立
+判断 root 和配置文件；需要同时改变两者行为时，也应修改对应 LSP 文件。例如
+Oxlint LSP 识别 `oxlint.config.ts`，CLI 条件只识别 `.oxlintrc.json`；Oxfmt LSP
+也没有 formatter 的无配置 fallback。
+
 Conform 当前仍使用 formatter 列表的默认行为：如果多个 formatter 条件同时
 满足，且调用时没有设置 `stop_after_first = true`，Conform 可能按顺序执行多个
 formatter。工具规格只决定工具是否可用，不改变这个执行策略。
@@ -188,8 +196,10 @@ language server；ShellCheck 不支持 zsh，因此改用原生 `zsh -n` 语法�
 
 ## 当前语言清单
 
-下表列出规格中的 formatter、CLI linter 与 LSP 声明；声明仍受工具可用性、
-服务自身 filetype/root 和安装条件限制。Web 格式化组合指 `prettier → biome → oxfmt`。
+下表列出规格中的 Conform formatter、CLI linter 与 LSP 声明；formatter 栏的
+`—` 表示没有 Conform 映射，手动格式化仍可回退到支持格式化的已连接 LSP。
+这些声明仍受工具可用性、服务自身 filetype/root 和安装条件限制。
+Web 格式化组合指 `prettier → biome → oxfmt`。
 
 | 规格 / filetype | Formatter | CLI linter | LSP |
 | --- | --- | --- | --- |
@@ -246,7 +256,8 @@ lint_filetypes = { "typescript" },
 3. 按需补充 `formatters`、`linters`、`lsp` 和 `treesitter`。
 4. 如果 LSP 名称没有对应的 `lsp/<名称>.lua`，新建该文件。
 5. 如果工具需要配置文件条件，在 `toolchain/tool/specs/` 中新增或修改对应工具规格。
-6. 打开该语言文件，确认 LSP、格式化、lint 和 Treesitter 行为。
+6. 需要 Mason 自动安装的工具，在 `lua/toolchain/mason.lua` 中添加显式名称映射，即使运行时名称与包名相同也要登记。
+7. 打开该语言文件，确认 LSP、格式化、lint 和 Treesitter 行为。
 
 新增语言不需要修改语言列表，也不需要手动加入 fzf source；`<leader>cL`
 会自动显示新语言规格。
@@ -277,9 +288,9 @@ lint_filetypes = { "typescript" },
 | `golangcilint` | `golangci-lint` |
 | `ruff_format` | `ruff` |
 
-名称映射位于 `lua/toolchain/mason.lua`。新增 LSP、formatter 或 linter 时，
-如果它没有使用相同的 Mason 包名，需要在该映射中补充；否则它会继续被配置
-使用，但 Mason 不会自动安装它。
+名称映射位于 `lua/toolchain/mason.lua`。需要 Mason 自动安装的 LSP、formatter
+或 linter 都必须显式登记，即使运行时名称与 Mason 包名相同。未映射的工具仍会
+被配置声明使用，但除非列入 `extra_packages`，否则不会进入自动安装清单。
 
 调试适配器和通用辅助工具仍在 `extra_packages` 中维护，不会因为当前语言
 没有打开而被移除。Mason 注册表刷新失败或包不存在时，安装动作由 Mason
@@ -291,6 +302,11 @@ LSP 则按 `FileType` 启用：有名称映射时，必须先在 Mason 中安装
 也未映射，应自行准备。ESLint 没有包名映射，CLI lint 需要项目或 PATH 提供。
 `bacon-ls` 没有名称映射，但已列入额外安装清单。zsh filetype 与 bash 共用
 `bash-language-server` 的 Mason 包映射。
+
+语言规格的 filetype 触发首次 `vim.lsp.enable(name)`，随后该服务全局启用，
+后续附着范围由服务自己的 filetypes 和 root 规则决定。例如先打开 Go 文件启用
+gopls 后，它还可附着到 `gomod`、`gowork`、`gotmpl` buffer，尽管 Go 语言规格
+未列出这些类型。
 
 `lsp/emmylua.lua`、`lsp/nushell.lua`、`lsp/stylua.lua` 当前没有被语言规格启用。
 Java 声明了 `jdtls`，其配置仅为 `cmd = "jdtls"`，没有项目 workspace 或调试集成。
@@ -316,7 +332,7 @@ nvim --headless -u NONE \
 
 ## 与其他模块的关系
 
-- `lua/config/lsp.lua` 调用 `toolchain.setup()`，并负责 LSP 的缓冲区绑定、进度事件和快捷键。
+- `lua/config/lsp.lua` 调用 `toolchain.setup()`，并负责 LSP 的缓冲区绑定、诊断、快捷键和支持的提示功能。
 - `lua/plugins/formatter.lua` 使用 formatter 聚合结果和工具条件；当前仅配置手动格式化。
 - `lua/plugins/linter.lua` 使用 linter 聚合结果，在读文件、写文件、离开插入模式时触发。
 - `lua/plugins/highlight/treesitter.lua` 使用 parser 聚合结果，并在 parser 缺失时触发安装和重试。

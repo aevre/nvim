@@ -67,7 +67,7 @@ These are common normal-mode mappings. See the [keymap reference](docs/keymaps.m
 | `<leader>L` / `<leader>cm` | Lazy / Mason |
 | `<leader>?` | Current-buffer keymap hints |
 
-The auto-save plugin saves conditionally on `InsertLeave` and `TextChanged`. **Conform format-on-save is not configured.** Defaults include two-space indentation, relative line numbers, and persistent undo. Under SSH, `unnamedplus` system clipboard integration is disabled.
+autosave.nvim uses a 1000ms delay, disables save notifications, and excludes Oil buffers. **Conform format-on-save is not configured.** Defaults include two-space indentation, relative line numbers, and persistent undo. Under SSH, `unnamedplus` system clipboard integration is disabled.
 
 ## Layout
 
@@ -77,18 +77,17 @@ lua/config/                Options, autocmds, global keys, LSP, plugin bootstrap
 lua/plugins/               Lazy specs by feature and plugin implementation modules
 lua/toolchain/             Language specs, tool conditions, Mason package mappings
 lsp/                       Native LSP commands, roots, and settings
-lua/builtin/               Local buffer utilities
 lua/theme/                 Palette, highlights, and transparency
 palette.json               JSON overrides for the current theme
 lua/sources/               Language, LSP, notification, and icon sources for fzf
 lua/utils/                 Shared helpers
-snippets/                  Local LuaSnip snippets (currently Vue)
+snippets/                  Local LuaSnip snippets for Go, Java, and Vue
 after/ftplugin/            Filetype additions for Vue, Oil, and mini.files
 docs/                      English and Chinese reference guides
 lazy-lock.json             Plugin version lockfile
 ```
 
-Startup order: theme → options → autocmds → keymaps → LSP/toolchain → lazy.nvim bootstrap → custom events → plugin manager. `BufEdit` is a local Lazy event alias covering `BufReadPost`, `BufNewFile`, and `BufWritePre`.
+Startup order: theme → options → filetype detection → autocmds → keymaps → LSP/toolchain → lazy.nvim bootstrap → custom events → plugin manager. `BufEdit` is a local Lazy event alias covering `BufReadPost`, `BufNewFile`, and `BufWritePre`.
 
 ## Customization
 
@@ -97,6 +96,6 @@ Startup order: theme → options → autocmds → keymaps → LSP/toolchain → 
 - Add or adjust languages: see the [toolchain guide](docs/toolchain.md); `<leader>cL` opens a definition directly.
 - LSP parameters: [lsp/](lsp/). A file's presence does not enable a server: the language declaration, installation, and root conditions must also be satisfied.
 - Theme: [lua/theme/](lua/theme/) and [palette.json](palette.json). Startup applies the local theme directly; it does not run `colorscheme tokyonight`. `:TransparentToggle` toggles and persists transparency.
-- Local plugin development: set `NVIM_PLUGIN_MODE=dev` to load the six personal plugins (`win`, `animate`, `scroll`, `terminal`, `lazygit`, `notify`) from `~/Projects/lib`; unset it or use another value to load their Codeberg repositories. `NVIM_DEV_DIR` remains Lazy's separate generic local-plugin matcher.
+- Local plugin development: set `NVIM_PLUGIN_MODE=dev` to load the nine personal plugins (`win`, `animate`, `scroll`, `terminal`, `lazygit`, `notify`, `cmdline`, `autosave`, `session`) from `~/Projects/lib`; unset it or use another value to load their Codeberg repositories. `NVIM_DEV_DIR` remains Lazy's separate generic local-plugin matcher.
 
 Use `:Lazy update` to update plugins, or `:Lazy restore` to restore versions from the committed lockfile. `<leader>pu` calls native Neovim `vim.pack.update()`; it does not update Lazy-managed plugins.

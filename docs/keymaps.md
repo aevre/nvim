@@ -27,13 +27,12 @@ Both `<leader>` and `<localleader>` are Space. The table lists mappings provided
 | `<leader>ur` | `n` | Clear highlights, update diff, and redraw |
 | `<leader>K` | `n` | Execute `keywordprg` |
 
-Source: [general.lua](../lua/config/keymaps/general.lua), [init.lua](../lua/config/init.lua). Neovim 0.12's built-in mappings such as `gra/gri/grn/grr/grt/grx/gO`, insert-mode `<C-s>`, and `an/in` are deleted.
+Source: [general.lua](../lua/config/keymaps/general.lua). Neovim 0.12's built-in mappings such as `gra/gri/grn/grr/grt/grx/gO`, insert-mode `<C-s>`, and `an/in` are deleted.
 
 ## Files, Buffers, Windows, and Tabs
 
 | Key | Mode | Action |
 | --- | --- | --- |
-| `<leader>fn` | `n` | Create an empty file |
 | `<leader>fs` | `n` | Reload the current file |
 | `<leader>fe` | `n` | Change the current working directory |
 | `<S-h>` / `<S-l>`, `[b` / `]b` | `n` | Previous / next buffer |
@@ -54,7 +53,7 @@ Source: [general.lua](../lua/config/keymaps/general.lua), [init.lua](../lua/conf
 
 Source: [file.lua](../lua/config/keymaps/file.lua), [buffer.lua](../lua/config/keymaps/buffer.lua), [window.lua](../lua/config/keymaps/window.lua), [tab.lua](../lua/config/keymaps/tab.lua).
 
-Window dimensions change by 2 rows or columns at a time; a count can multiply the adjustment.
+Window dimensions change by 2 rows or columns at a time; a count can multiply the adjustment. `file.lua` also defines `<leader>fn` for a new file, but the startup-loaded fzf spec reuses it for Fidget history; use `:enew` to create an empty buffer.
 
 ## Search, File Finding, and Replacement
 
@@ -77,7 +76,8 @@ The following are fzf-lua's top-level Lazy `keys`; the plugin sets `lazy = false
 | `<leader>s/` | `n` | Search history |
 | `<leader>sC` / `<leader>sc` | `n` | Command list / command history |
 | `<leader>sh` / `<leader>sH` | `n` | Help pages / highlight groups |
-| `<leader>n` / `<leader>cL` | `n` | Notification history / language configuration |
+| `<leader>n` / `<leader>fn` | `n` | Notification history / Fidget history |
+| `<leader>cL` | `n` | Language configuration |
 | `<leader>sk` | `n` | Show keymaps |
 | `<leader>sd` / `<leader>sD` | `n` | Workspace / current document diagnostics |
 | `<leader>sq` / `<leader>sl` | `n` | quickfix / location list |
@@ -110,6 +110,7 @@ Source: [fzf.lua](../lua/plugins/qol/fzf.lua), [grug-far.lua](../lua/plugins/qol
 | `gI` | `n` | Implementation |
 | `gy` | `n` | Type definition |
 | `K` | `n` | Hover documentation |
+| `gK` | `n` | Signature help (when supported by the client) |
 | `<leader>ca` | `n,x` | Code Action |
 | `<leader>cr` | `n` | Rename symbol |
 | `<leader>cR` | `n` | Delete the old file after `saveas` to a new path; not an LSP file rename |
@@ -121,21 +122,23 @@ Source: [fzf.lua](../lua/plugins/qol/fzf.lua), [grug-far.lua](../lua/plugins/qol
 | `<leader>cc` | `n` | Run codelens (when supported by the client) |
 | `<leader>cA` | `n` | Source Action |
 
-Source: [lsp.lua](../lua/config/lsp.lua), [diagnostic.lua](../lua/config/keymaps/diagnostic.lua). These mappings are set when an LSP attaches. Inlay hints and codelens require client support.
+Source: [lsp.lua](../lua/config/lsp.lua), [diagnostic.lua](../lua/config/keymaps/diagnostic.lua). These mappings are set when an LSP attaches. Signature help, inlay hints, and codelens mappings require client support.
 
 ## Terminal, Git, Plugins, and Sessions
 
 | Key | Mode | Action |
 | --- | --- | --- |
-| `<leader>tf` | `n` | Floating terminal |
+| `<leader>ts` | `n` | Select a terminal |
+| `<leader>tf` | `n` | Toggle floating terminal |
+| `<leader>tk/tj/th/tl` | `n` | Toggle top / bottom / left / right terminal |
 | `<leader>tm` | `n` | Floating `rmpc` |
 | `<leader>gg` | `n` | Lazygit |
 | `<leader>pu` | `n` | Call `vim.pack.update()` (not a Lazy update) |
-| `jk` | `t` | Return to normal mode in this configuration's floating terminal / rmpc |
+| `jk` | `t` | Return to normal mode in this configuration's terminal windows / rmpc |
 | `<leader>L` | `n` | Lazy |
 | `<leader>qs` / `<leader>qS` | `n` | Restore / select a session |
 | `<leader>ql` | `n` | Restore the most recent session |
-| `<leader>qd` | `n` | Do not save the current session |
+| `<leader>qw` | `n` | Save the current session (`SessionSave`) |
 | `<leader>v` | `n,x` | Yank history |
 | `[y` / `]y` | `n` | Cycle through yank history |
 | `y`, `p`, `P`, `gp`, `gP` | `n,x` | Yanky copy and paste |
@@ -144,7 +147,7 @@ Source: [lsp.lua](../lua/config/lsp.lua), [diagnostic.lua](../lua/config/keymaps
 | `<leader>cf` | `n` | Format |
 | `<leader>cD` | `n` | CodeDiff |
 
-Source: [terminal.lua](../lua/config/keymaps/terminal.lua), [lazy.lua](../lua/config/lazy.lua), [persistence.lua](../lua/plugins/qol/persistence.lua), [yanky.lua](../lua/plugins/qol/yanky.lua), [screenkey.lua](../lua/plugins/ui/screenkey.lua), [mason.lua](../lua/plugins/lsp/mason.lua), [formatter.lua](../lua/plugins/formatter.lua), [codediff.lua](../lua/plugins/editor/codediff.lua). The terminal plugin provides `q` to hide and `gf` to open the file under the cursor; the floating configuration uses `jk` to leave terminal mode.
+Source: [terminal.lua](../lua/config/keymaps/terminal.lua), [lazy.lua](../lua/config/lazy.lua), [session.lua](../lua/plugins/qol/session.lua), [yanky.lua](../lua/plugins/qol/yanky.lua), [screenkey.lua](../lua/plugins/ui/screenkey.lua), [mason.lua](../lua/plugins/lsp/mason.lua), [formatter.lua](../lua/plugins/formatter.lua), [codediff.lua](../lua/plugins/editor/codediff.lua). All terminal positions configured here use `jk` to leave terminal mode.
 
 ## Coding, Completion, and Text Objects
 
@@ -168,16 +171,16 @@ Source: [terminal.lua](../lua/config/keymaps/terminal.lua), [lazy.lua](../lua/co
 | `]a` / `[a`, `]A` / `[A` | `n,x,o` | Next / previous parameter start or end |
 | `]z` | `n,x,o` | Next fold point |
 | `]=` / `[=`, `]r` / `[r` | `n` | Next / previous assignment, return |
-| `>a` / `<a`, `>f` / `<f` | `n` | Swap parameters / functions |
+| `<leader>ma/mA`, `<leader>mf/mF` | `n` | Swap with next / previous parameter or function |
 | `gsa` | `n,x` | Add a surround (follow with an action in normal mode) |
 | `gsd` / `gsr` | `n` | Delete / replace a surround |
 | `gsf` / `gsF` / `gsh` | `n` | Find right / find left / highlight a surround |
 | `<C-a>` / `<C-x>` | `n,v` | Increment / decrement numbers, dates, booleans, etc. |
 | `g<C-a>` / `g<C-x>` | `n,x` | Increment / decrement each item in a selection |
 
-Source: [blink-cmp.lua](../lua/plugins/coding/blink-cmp.lua), [flash.lua](../lua/plugins/qol/flash.lua), [treesitter-textobjects.lua](../lua/plugins/editor/treesitter-textobjects.lua), [mini-surround.lua](../lua/plugins/editor/mini-surround.lua), [dial.lua](../lua/plugins/editor/dial.lua). `f/F/t/T` are also wrapped in `n,x,o` modes to support repeated movement. Blink's table describes explicit insert-mode keys; command-line completion has separate configuration, so the entire table cannot be treated as command-line mappings. `mini-pairs` is disabled.
+Source: [blink-cmp.lua](../lua/plugins/coding/blink-cmp.lua), [flash.lua](../lua/plugins/qol/flash.lua), [treesitter-textobjects.lua](../lua/plugins/editor/treesitter-textobjects.lua), [mini-surround.lua](../lua/plugins/editor/mini-surround.lua), [dial.lua](../lua/plugins/editor/dial.lua). `f/F/t/T` are also wrapped in `n,x,o` modes to support repeated movement. Blink's table describes explicit insert-mode keys; command-line completion has separate configuration, so the entire table cannot be treated as command-line mappings. `mini-pairs` is disabled. Flash provides the Treesitter search and incremental selection mappings. cmdline.nvim provides the command-line UI; noice.nvim and tiny-cmdline.nvim are disabled.
 
-[mini-ai.lua](../lua/plugins/editor/mini-ai.lua) provides `a/i`, `an/in` (next), and `al/il` (previous) text-object prefixes in `x,o` modes; `g[/g]` jumps to the object's left/right boundary in `n,x,o`. Custom objects: `o` block/conditional/loop, `f` function, `c` class, `a` parameter, `d` number, `e` case-sensitive word segment, `g` entire buffer, `u/U` function call. For example, `dif` deletes inside a function, `yaa` copies a parameter with its separator, `yag` copies the entire buffer; `ap/ip` keep mini.ai's paragraph object. The built-in `an/in` mappings deleted at startup do not prevent mini.ai from registering them again after it loads. Treesitter swap mappings use `<leader>ma/mA` for next/previous parameters and `<leader>mf/mF` for next/previous functions, leaving the notification `<leader>n` prefix and native `>a` / `<a` indentation combinations untouched.
+[mini-ai.lua](../lua/plugins/editor/mini-ai.lua) provides `a/i`, `an/in` (next), and `al/il` (previous) text-object prefixes in `x,o` modes; `g[/g]` jumps to the object's left/right boundary in `n,x,o`. Custom objects: `o` block/conditional/loop, `f` function, `c` class, `a` parameter, `d` number, `e` case-sensitive word segment, `g` entire buffer, `u/U` function call. For example, `dif` deletes inside a function, `yaa` copies a parameter with its separator, `yag` copies the entire buffer; `ap/ip` keep mini.ai's paragraph object. The built-in `an/in` mappings deleted at startup do not prevent mini.ai from registering them again after it loads. Treesitter swap mappings use `<leader>ma/mA` for next/previous parameters and `<leader>mf/mF` for next/previous functions.
 
 [blink-pairs.lua](../lua/plugins/editor/blink-pairs.lua) configures `<C-b>` / `<C-S-b>` wrapping actions to move closing / opening brackets (insert mode, with command-line mappings enabled).
 
@@ -237,4 +240,5 @@ Source: [llm/init.lua](../lua/plugins/qol/llm/init.lua), [llm/keymaps.lua](../lu
 
 - `<leader>?` (`n`) shows buffer-local mappings: [which-key.lua](../lua/plugins/qol/which-key.lua).
 - `<leader>xl/xq` (`n`) toggles the location/quickfix windows; `[q/]q` jumps through quickfix; `<leader>qq` exits all windows; `<leader>ui/uI` inspects the location/Treesitter trees: [general.lua](../lua/config/keymaps/general.lua).
+- Alpha dashboard keys (`n`): `f/g/r/c` find files / search text / recent files / config files; `s/S` restore / select a session; `L/q` open Lazy / quit: [dashboard.lua](../lua/plugins/ui/dashboard.lua).
 - When a mapping is overridden, run `:verbose nmap <key>`, `:verbose imap <key>`, or the corresponding command for the mode to inspect the current mapping and its last set location.

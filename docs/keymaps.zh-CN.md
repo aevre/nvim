@@ -27,13 +27,12 @@
 | `<leader>ur` | `n` | 清除高亮、更新 diff、重绘 |
 | `<leader>K` | `n` | 执行 `keywordprg` |
 
-来源：[general.lua](../lua/config/keymaps/general.lua)、[init.lua](../lua/config/init.lua)。Neovim 0.12 的 `gra/gri/grn/grr/grt/grx/gO`、插入态 `<C-s>` 和 `an/in` 等内置映射会被删除。
+来源：[general.lua](../lua/config/keymaps/general.lua)。Neovim 0.12 的 `gra/gri/grn/grr/grt/grx/gO`、插入态 `<C-s>` 和 `an/in` 等内置映射会被删除。
 
 ## 文件、缓冲区、窗口与标签页
 
 | 按键 | 模式 | 用途 |
 | --- | --- | --- |
-| `<leader>fn` | `n` | 新建空文件 |
 | `<leader>fs` | `n` | 重新载入当前文件 |
 | `<leader>fe` | `n` | 修改当前工作目录 |
 | `<S-h>` / `<S-l>`、`[b` / `]b` | `n` | 上一个 / 下一个缓冲区 |
@@ -54,7 +53,7 @@
 
 来源：[file.lua](../lua/config/keymaps/file.lua)、[buffer.lua](../lua/config/keymaps/buffer.lua)、[window.lua](../lua/config/keymaps/window.lua)、[tab.lua](../lua/config/keymaps/tab.lua)。
 
-窗口尺寸每次调整 2 行或列，可加计数倍增。
+窗口尺寸每次调整 2 行或列，可加计数倍增。`file.lua` 也将 `<leader>fn` 定义为新建文件，但启动加载的 fzf spec 将其复用于 Fidget 历史；新建空 buffer 可使用 `:enew`。
 
 ## 搜索、文件查找与替换
 
@@ -77,7 +76,8 @@
 | `<leader>s/` | `n` | 搜索历史 |
 | `<leader>sC` / `<leader>sc` | `n` | 命令列表 / 命令历史 |
 | `<leader>sh` / `<leader>sH` | `n` | 帮助页 / 高亮组 |
-| `<leader>n` / `<leader>cL` | `n` | 通知历史 / 语言配置 |
+| `<leader>n` / `<leader>fn` | `n` | 通知历史 / Fidget 历史 |
+| `<leader>cL` | `n` | 语言配置 |
 | `<leader>sk` | `n` | 查看键位 |
 | `<leader>sd` / `<leader>sD` | `n` | 工作区 / 当前文档诊断 |
 | `<leader>sq` / `<leader>sl` | `n` | quickfix / location list |
@@ -110,6 +110,7 @@
 | `gI` | `n` | 实现 |
 | `gy` | `n` | 类型定义 |
 | `K` | `n` | 悬停文档 |
+| `gK` | `n` | 签名帮助（client 支持时） |
 | `<leader>ca` | `n,x` | Code Action |
 | `<leader>cr` | `n` | 符号重命名 |
 | `<leader>cR` | `n` | `saveas` 新路径后删除旧文件，不是 LSP 文件重命名 |
@@ -121,21 +122,23 @@
 | `<leader>cc` | `n` | 运行 codelens（client 支持时） |
 | `<leader>cA` | `n` | Source Action |
 
-来源：[lsp.lua](../lua/config/lsp.lua)、[diagnostic.lua](../lua/config/keymaps/diagnostic.lua)。导航、重命名和 code action 等映射在 LSP 连接后全局注册。Inlay hints 和 codelens 需要语言服务支持。
+来源：[lsp.lua](../lua/config/lsp.lua)、[diagnostic.lua](../lua/config/keymaps/diagnostic.lua)。导航、重命名和 code action 等映射在 LSP 连接后全局注册。签名帮助、inlay hints 和 codelens 的映射按语言服务能力注册。
 
 ## 终端、Git、插件与会话
 
 | 按键 | 模式 | 用途 |
 | --- | --- | --- |
-| `<leader>tf` | `n` | 浮动终端 |
+| `<leader>ts` | `n` | 选择终端 |
+| `<leader>tf` | `n` | 切换浮动终端 |
+| `<leader>tk/tj/th/tl` | `n` | 切换上 / 下 / 左 / 右侧终端 |
 | `<leader>tm` | `n` | 浮动 `rmpc` |
 | `<leader>gg` | `n` | Lazygit |
 | `<leader>pu` | `n` | 调用 `vim.pack.update()`（不是 Lazy 更新） |
-| `jk` | `t` | 本配置的浮动终端 / rmpc 返回普通模式 |
+| `jk` | `t` | 本配置的终端窗口 / rmpc 返回普通模式 |
 | `<leader>L` | `n` | Lazy |
 | `<leader>qs` / `<leader>qS` | `n` | 恢复 / 选择会话 |
 | `<leader>ql` | `n` | 恢复最近会话 |
-| `<leader>qd` | `n` | 不保存当前会话 |
+| `<leader>qw` | `n` | 保存当前会话（`SessionSave`） |
 | `<leader>v` | `n,x` | Yank 历史 |
 | `[y` / `]y` | `n` | 循环 Yank 历史 |
 | `y`、`p`、`P`、`gp`、`gP` | `n,x` | Yanky 复制与粘贴 |
@@ -144,7 +147,7 @@
 | `<leader>cf` | `n` | 格式化 |
 | `<leader>cD` | `n` | CodeDiff |
 
-来源：[terminal.lua](../lua/config/keymaps/terminal.lua)、[lazy.lua](../lua/config/lazy.lua)、[persistence.lua](../lua/plugins/qol/persistence.lua)、[yanky.lua](../lua/plugins/qol/yanky.lua)、[screenkey.lua](../lua/plugins/ui/screenkey.lua)、[mason.lua](../lua/plugins/lsp/mason.lua)、[formatter.lua](../lua/plugins/formatter.lua)、[codediff.lua](../lua/plugins/editor/codediff.lua)。终端插件提供 `q` 隐藏、`gf` 打开光标文件；浮窗配置使用 `jk` 退出终端模式。
+来源：[terminal.lua](../lua/config/keymaps/terminal.lua)、[lazy.lua](../lua/config/lazy.lua)、[session.lua](../lua/plugins/qol/session.lua)、[yanky.lua](../lua/plugins/qol/yanky.lua)、[screenkey.lua](../lua/plugins/ui/screenkey.lua)、[mason.lua](../lua/plugins/lsp/mason.lua)、[formatter.lua](../lua/plugins/formatter.lua)、[codediff.lua](../lua/plugins/editor/codediff.lua)。这里配置的所有终端位置均使用 `jk` 退出终端模式。
 
 ## 编码、补全与文本对象
 
@@ -168,16 +171,16 @@
 | `]a` / `[a`、`]A` / `[A` | `n,x,o` | 下一个 / 上一个参数起点或终点 |
 | `]z` | `n,x,o` | 下一个 fold 点 |
 | `]=` / `[=`、`]r` / `[r` | `n` | 下一个 / 上一个 assignment、return |
-| `>a` / `<a`、`>f` / `<f` | `n` | 交换参数 / 函数 |
+| `<leader>ma/mA`、`<leader>mf/mF` | `n` | 与下一个 / 上一个参数或函数交换 |
 | `gsa` | `n,x` | 添加环绕（普通模式后接动作） |
 | `gsd` / `gsr` | `n` | 删除 / 替换环绕 |
 | `gsf` / `gsF` / `gsh` | `n` | 向右找 / 向左找 / 高亮环绕 |
 | `<C-a>` / `<C-x>` | `n,v` | 增大 / 减小数字、日期、布尔值等 |
 | `g<C-a>` / `g<C-x>` | `n,x` | 对选区逐项增大 / 减小 |
 
-来源：[blink-cmp.lua](../lua/plugins/coding/blink-cmp.lua)、[flash.lua](../lua/plugins/qol/flash.lua)、[treesitter-textobjects.lua](../lua/plugins/editor/treesitter-textobjects.lua)、[mini-surround.lua](../lua/plugins/editor/mini-surround.lua)、[dial.lua](../lua/plugins/editor/dial.lua)。`f/F/t/T` 也在 `n,x,o` 模式被包装以支持重复移动。Blink 的表描述插入态显式键位；命令行补全另有配置，不能将整张表直接视为命令行映射。`mini-pairs` 已禁用。
+来源：[blink-cmp.lua](../lua/plugins/coding/blink-cmp.lua)、[flash.lua](../lua/plugins/qol/flash.lua)、[treesitter-textobjects.lua](../lua/plugins/editor/treesitter-textobjects.lua)、[mini-surround.lua](../lua/plugins/editor/mini-surround.lua)、[dial.lua](../lua/plugins/editor/dial.lua)。`f/F/t/T` 也在 `n,x,o` 模式被包装以支持重复移动。Blink 的表描述插入态显式键位；命令行补全另有配置，不能将整张表直接视为命令行映射。`mini-pairs` 已禁用。Treesitter 搜索与增量选择由 Flash 提供；命令行界面使用 cmdline.nvim，noice.nvim 和 tiny-cmdline.nvim 均已禁用。
 
-[mini-ai.lua](../lua/plugins/editor/mini-ai.lua) 在 `x,o` 模式提供 `a/i`、`an/in`（下一个）、`al/il`（上一个）文本对象前缀，`g[/g]` 在 `n,x,o` 跳到对象左/右边界。自定义对象：`o` 块/条件/循环、`f` 函数、`c` 类、`a` 参数、`d` 数字、`e` 大小写词段、`g` 整个缓冲区、`u/U` 函数调用。例如 `dif` 删除函数内部、`yaa` 复制带分隔符的参数、`yag` 复制整个缓冲区；`ap/ip` 保留 mini.ai 的段落对象。启动时删除的内置 `an/in` 不妨碍 mini.ai 加载后重新注册。Treesitter 交换使用 `<leader>ma/mA` 交换下一个/上一个参数，使用 `<leader>mf/mF` 交换下一个/上一个函数，从而避开通知使用的 `<leader>n` 前缀，也不覆盖原生 `>a` 和 `<a` 缩进组合。
+[mini-ai.lua](../lua/plugins/editor/mini-ai.lua) 在 `x,o` 模式提供 `a/i`、`an/in`（下一个）、`al/il`（上一个）文本对象前缀，`g[/g]` 在 `n,x,o` 跳到对象左/右边界。自定义对象：`o` 块/条件/循环、`f` 函数、`c` 类、`a` 参数、`d` 数字、`e` 大小写词段、`g` 整个缓冲区、`u/U` 函数调用。例如 `dif` 删除函数内部、`yaa` 复制带分隔符的参数、`yag` 复制整个缓冲区；`ap/ip` 保留 mini.ai 的段落对象。启动时删除的内置 `an/in` 不妨碍 mini.ai 加载后重新注册。Treesitter 交换使用 `<leader>ma/mA` 交换下一个/上一个参数，使用 `<leader>mf/mF` 交换下一个/上一个函数。
 
 [blink-pairs.lua](../lua/plugins/editor/blink-pairs.lua) 配置 `<C-b>` / `<C-S-b>` 包裹动作以移动闭合 / 开启括号（插入态，并启用命令行映射）；插入态 `<C-b>` 与 Blink 补全文档滚动重叠，实际优先级取决于注册顺序。
 
@@ -237,5 +240,5 @@
 
 - `<leader>?`（`n`）显示当前缓冲区局部映射：[which-key.lua](../lua/plugins/qol/which-key.lua)。其中 `spec` 只是提示分组，`icons.keys` 只是图标文本，不创建动作。
 - `<leader>xl/xq`（`n`）切换 location/quickfix 窗口；`[q/]q` 跳转 quickfix；`<leader>qq` 退出所有窗口；`<leader>ui/uI` 检查位置/Treesitter 树：[general.lua](../lua/config/keymaps/general.lua)。
-- Alpha 首页（`n`）的 `s/S/L/q` 恢复会话/选择会话/打开 Lazy/退出：[dashboard.lua](../lua/plugins/ui/dashboard.lua)。
+- Alpha 首页（`n`）的 `f/g/r/c` 查找文件/搜索文本/最近文件/配置文件，`s/S/L/q` 恢复会话/选择会话/打开 Lazy/退出：[dashboard.lua](../lua/plugins/ui/dashboard.lua)。
 - 遇到覆盖可运行 `:verbose nmap <按键>`、`:verbose imap <按键>` 或对应模式命令，检查当前映射与最后设置位置。
