@@ -9,7 +9,7 @@
   "blink.indent": { "branch": "main", "commit": "2e9c9768affeaf3a48b2dc329eb59763012f79f6" },
   "blink.lib": { "branch": "main", "commit": "fd9a48ebbe6ec30d5dfcc5b42c243941ccdca1aa" },
   "blink.pairs": { "branch": "main", "commit": "c382bc4ba0229211c8ae19491bb7aa930c051a42" },
-  "cmdline.nvim": { "branch": "master", "commit": "2a357617afb4956cfe0bfc6b3a9d23f040c38601" },
+  "cmdline.nvim": { "branch": "master", "commit": "b0ce6f6e0922c4827456222a90d981b834e4e283" },
   "codediff.nvim": { "branch": "main", "commit": "09d9ebef2cc5a5c04db7a349cd6c61bdf84ecc8e" },
   "colorful-menu.nvim": { "branch": "master", "commit": "196ddf16d5f8fec09ba7f20e6b153aa5188e907b" },
   "colorful-winsep.nvim": { "branch": "main", "commit": "6134b5cd4a38990c7b720adc90973ed32f726179" },

@@ -38,4 +38,11 @@ end
 
 add("Brewfile", "ruby")
 
-vim.filetype.add({ filename = filename })
+vim.filetype.add({
+	filename = filename,
+	pattern = {
+		[".*%.example"] = function(path)
+			return vim.filetype.match({ filename = path:sub(1, -9) })
+		end,
+	},
+})

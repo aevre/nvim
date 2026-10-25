@@ -9,17 +9,12 @@ return {
 			icon_hl = "DevIconTerminal"
 		end
 		self.icon = icon
-		if icon_hl then
-			local hl_val = vim.api.nvim_get_hl(0, { name = icon_hl, link = false })
-			self.icon_color = hl_val.fg and string.format("#%06x", hl_val.fg) or nil
-		else
-			self.icon_color = nil
-		end
+		self.icon_hl = icon_hl
 	end,
 	provider = function(self)
 		return self.icon and (self.icon .. " ")
 	end,
 	hl = function(self)
-		return { fg = self.icon_color }
+		return self.icon_hl
 	end,
 }
