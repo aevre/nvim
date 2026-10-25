@@ -16,7 +16,6 @@ local function size()
 end
 
 return {
-	common.FileIcon,
 	{
 		provider = function()
 			return size() .. " "

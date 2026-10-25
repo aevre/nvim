@@ -26,6 +26,7 @@ return {
 		lsp_progress = true,
 		debug = vim.env.NVIM_PLUGIN_MODE == "dev",
 		routes = {
+			{ match = { exact = { "notify" }, message = { [[\vsaved .*]] } }, to = "fidget" },
 			-- Route write confirmations to Fidget; Vim regex, case-insensitive.
 			{ match = { exact = { "notify" }, message = { [[\v\c(written|已写入)]] } }, to = "fidget" },
 			-- Keep other vim.notify() messages in the regular notification backend.
