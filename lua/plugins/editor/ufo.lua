@@ -8,6 +8,8 @@ return {
 		vim.o.foldlevel = 99
 		vim.o.foldlevelstart = 99
 		vim.o.foldenable = true
+		-- use Neovim nightly branch
+		vim.o.fillchars = "eob: ,fold: ,foldopen:,foldsep: ,foldinner: ,foldclose:"
 	end,
 	opts = {
 		provider_selector = function()
@@ -15,7 +17,19 @@ return {
 		end,
 	},
 	keys = {
-		{ "zR", function() require("ufo").openAllFolds() end, desc = "Open all folds" },
-		{ "zM", function() require("ufo").closeAllFolds() end, desc = "Close all folds" },
+		{
+			"zR",
+			function()
+				require("ufo").openAllFolds()
+			end,
+			desc = "Open all folds",
+		},
+		{
+			"zM",
+			function()
+				require("ufo").closeAllFolds()
+			end,
+			desc = "Close all folds",
+		},
 	},
 }
