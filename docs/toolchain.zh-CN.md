@@ -213,7 +213,7 @@ Web 格式化组合指 `prettier → biome → oxfmt`。
 | dart / dart | — | — | dartls |
 | go / go | goimports, gofumpt | golangcilint | gopls |
 | html / html | Web 组合 | — | html, emmet-language-server, stylelint-language-server, tailwindcss, biome, oxfmt |
-| java / java | — | — | jdtls（仅声明命令） |
+| java / java | — | — | jdtls（原生 LSP、独立项目 workspace） |
 | javascript / javascript, javascriptreact | Web 组合 | eslint, oxlint（仅 javascript） | vtsls, biome, oxlint, cssmodules-language-server, oxfmt |
 | json / json, jsonc | Web 组合 | — | jsonls, biome, oxfmt |
 | kotlin / kotlin | — | — | kotlin-lsp |
@@ -308,7 +308,7 @@ gopls 后，它还可附着到 `gomod`、`gowork`、`gotmpl` buffer，尽管 Go 
 未列出这些类型。
 
 `lsp/emmylua.lua`、`lsp/nushell.lua`、`lsp/stylua.lua` 当前没有被语言规格启用。
-Java 声明了 `jdtls`，其配置仅为 `cmd = "jdtls"`，没有项目 workspace 或调试集成。
+Java 使用原生 `vim.lsp`，配置分层多模块/单模块 root、共享 cache configuration 和按绝对路径散列的独立 `-data` workspace。`JDTLS_JVM_ARGS` 按空白拆分为 `--jvm-arg` 参数。已移除 `nvim-jdtls`；尚未接入 java-debug/vscode-java-test bundles 及其扩展命令。
 
 ## 调试
 
@@ -316,9 +316,9 @@ Java 声明了 `jdtls`，其配置仅为 `cmd = "jdtls"`，没有项目 workspac
 
 `setup_debug(opts)` 保留原生配置并保证重复调用幂等；`{ override = true }` 覆盖冲突，`{ launch_json = false }` 恢复先前 provider，包括原生基于当前目录的 provider。默认保留用户自定义 provider。provider 按需读取最近的 `.vscode/launch.json`，展开 workspace 变量，并将 node/python/go 别名映射为 pwa-node/debugpy/delve；不支持 VS Code tasks/extensions 或浏览器默认配置。Toolchain 自带输入取消或留空会中止；原生 launch.json 输入沿用 nvim-dap 行为，取消未必转换成 `dap.ABORT`。不实现 VS Code command 变量、compound、task 和扩展专属字段。
 
-GDB 需系统提供 14.1+ 且带 Python/DAP 支持，不通过 Mason 安装。GDB 版本校验和 debugpy 导入校验均限制为 3 秒；缺少或无效的 adapter 会立即报告清晰错误，不会让异步 callback 一直挂起。Python 依次选择项目 `.venv`、`venv`、活动 `VIRTUAL_ENV`、系统 Python。JS 使用命令包装器或项目的 `@vscode/js-debug`；TypeScript 提示选择编译后的 JS。Vue 仅支持 attach；需手动启动 npm/pnpm inspector 脚本。Cargo 要求已有编译产物并提示选择，不会自动构建。
+GDB 需系统提供 14.1+ 且带 Python/DAP 支持，不通过 Mason 安装。GDB 版本校验和 debugpy 导入校验均限制为 3 秒；缺少或无效的 adapter 会立即报告清晰错误，不会让异步 callback 一直挂起。Python 依次选择项目 `.venv`、`venv`、活动 `VIRTUAL_ENV`、系统 Python。JS 使用命令包装器或项目的 `@vscode/js-debug`；TypeScript 提示选择编译后的 JS。Vue 仅支持 attach；需手动启动 npm/pnpm inspector 脚本。手动 Cargo 配置选择已有产物；rust-analyzer 的 `debugSingle` 会构建选中的 runnable，解析 Cargo JSON 产物后通过 GDB 启动。
 
-Mason 按 filetype 从语言规格映射包；`extra_packages` 默认空。仅添加 `nvim-dap`、`nvim-dap-view` 插件，未实现 test/coverage。12 个快捷键为：`<leader>dc` 继续/启动、`dp` 暂停、`dr` 重启、`dt` 终止、`db` 断点、`dB` 条件断点、`di` 步入、`do` 步过、`dO` 步出、`dg` 运行到光标、`du` 切换 UI、`de` REPL。
+Mason 按 filetype 从语言规格映射包；`extra_packages` 默认空。仅添加 `nvim-dap`、`nvim-dap-view` 插件，未实现测试结果或覆盖率框架。新增 `<leader>dl` 重复上次调试、`<leader>dh` 查看光标表达式；其他快捷键为：`<leader>dc` 继续/启动、`dp` 暂停、`dr` 重启、`dt` 终止、`db` 断点、`dB` 条件断点、`di` 步入、`do` 步过、`dO` 步出、`dg` 运行到光标、`du` 切换 UI、`de` REPL。
 
 ### 声明与扩展
 
@@ -360,16 +360,16 @@ require("toolchain").setup_debug()
 
 | 语言 | Adapter | 默认能力 |
 | --- | --- | --- |
-| C / C++ | GDB | 选择可执行文件、Attach 进程 |
-| Rust | GDB | 共享默认配置，加 Cargo 构建产物选择 |
+| C / C++ | GDB | 选择可执行文件、Attach 进程、选择已构建的 CTest 命令 |
+| Rust | GDB | 共享默认配置、手动 Cargo 产物选择、rust-analyzer runnable 自动构建调试 |
 | Go | Delve | Package、Current File、Package Tests、Attach 本地进程 |
 | Python | debugpy | File、Module、Attach 127.0.0.1:5678 |
-| JS / TS（含 React filetype） | vscode-js-debug | Node Launch、Inspector Attach、Source Maps |
+| JS / TS（含 React filetype） | vscode-js-debug | Node Launch、Inspector Attach、Source Maps、Jest 文件/测试名调试 |
 | Vue / Nuxt | vscode-js-debug | 仅 Node Inspector Attach |
 
-GDB 便于 Linux 上共享 C/C++/Rust；LLDB 在 macOS 集成和 Rust 可视化上可能更适合，可另加 Spec。请为构建产物启用 Debug Symbols；当前不会自动构建或加载 Rust pretty printer。Go Current File 仅适合自包含文件，Package Tests 调试整个包，不发现单个测试；Attach 仍受系统权限和调试器能力限制。
+GDB 便于 Linux 上共享 C/C++/Rust；LLDB 在 macOS 集成和 Rust 可视化上可能更适合，可另加 Spec。请为构建产物启用 Debug Symbols；手动 Cargo 配置不会构建；rust-analyzer `debugSingle` 会构建，但不会加载 Rust pretty printer。CTest 使用官方 JSON 发现测试，直接启动命令并保留参数和工作目录，不执行 fixtures、依赖编排或环境属性。Go Current File 仅适合自包含文件，Package Tests 调试整个包，不发现单个测试；Attach 仍受系统权限和调试器能力限制。
 
-Node Attach 默认端口 9229，需先自行通过 `node --inspect` 或 npm/pnpm 脚本启动服务。Monorepo 使用最近的 `package.json` 作为 cwd，特殊工作目录、环境变量、参数和 Runtime 可写入 launch.json。TS 默认选择编译后的 JS 并依赖 Source Maps；不自动转译 JSX，也不直接运行 Vue SFC。未配置浏览器调试。
+Node Attach 默认端口 9229，需先自行通过 `node --inspect` 或 npm/pnpm 脚本启动服务。Monorepo 使用最近的 `package.json` 作为 cwd，特殊工作目录、环境变量、参数和 Runtime 可写入 launch.json。TS 默认选择编译后的 JS 并依赖 Source Maps；不自动转译 JSX，也不直接运行 Vue SFC。未配置浏览器调试。Jest 向上查找 `node_modules/jest/bin/jest.js`，调试当前已保存文件，也可输入测试名正则；`<leader>dl` 重复上次调试。TS 断点仍依赖项目自己的 transform/source-map 配置。
 
 Python Adapter 与目标解释器独立：Mason Adapter 可以调试项目 `.venv`。其他解释器可通过原生 `pythonPath` 指定。本地 JS Adapter 仅使用已有构建入口 `node_modules/@vscode/js-debug/src/dapDebugServer.js`，不构建源码；优先使用 Mason 导出的命令包装器。
 
@@ -382,8 +382,7 @@ Go 的默认 Launch 配置使用 `outputMode = "remote"`，通过 DAP 转发 std
 ```sh
 stylua --check lua/toolchain lua/plugins/highlight/treesitter.lua lua/sources/language.lua
 git diff --check
-nvim --headless -u NONE -l tests/toolchain_regression.lua
-nvim --headless -u NONE -l tests/toolchain_debug.lua
+nvim --headless -u NONE -l tests/language_debug.lua
 ```
 
 实时 Go/C 会话使用实际 harness 环境，例如：
@@ -408,9 +407,9 @@ nvim --headless -u NONE \
 `<leader>cL` 显示语言名和 filetype，预览显示语言规格源码，默认选择直接
 打开对应的 `toolchain/lang/specs/<语言名>.lua` 文件。
 
-回归测试会比较既有 formatter/linter 关联和包基线，并刻意排除新增 debug 包。实际 Go Package、Current File、Package Tests、C GDB 与 Rust GDB 会话已通过完整的断点、继续、终止和 dap-view UI 生命周期检查。由于未安装 debugpy/js-debug-adapter，未运行 Python/JavaScript 真实会话，也没有执行安装。
+`tests/language_debug.lua` 检查 Jest 路径与取消操作、CTest JSON 命令映射、JDTLS workspace 隔离、Rust Cargo JSON 产物转换和聚合后可调用配置的保留。此前 Go Package、Current File、Package Tests、C GDB 与 Rust GDB 会话已通过断点和 UI 生命周期检查；新增集成尚未经过真实会话验证，本机缺少对应 adapter/server 和代表性 Jest/CTest 项目。
 
-Rust 每次 Cargo 启动都会以 3 秒超时调用 `cargo metadata --no-deps --format-version 1`。元数据成功时使用 `workspace_root` 和 `target_directory`；否则回退到最近的 Cargo 根目录和 `CARGO_TARGET_DIR`（或 `<root>/target`）。它只选择已有产物，不会自动构建。Go adapter 会使用所选配置的 `cwd` 启动 Delve。
+Rust 每次 Cargo 启动都会以 3 秒超时调用 `cargo metadata --no-deps --format-version 1`。元数据成功时使用 `workspace_root` 和 `target_directory`；否则回退到最近的 Cargo 根目录和 `CARGO_TARGET_DIR`（或 `<root>/target`）。此手动配置只选择已有产物；rust-analyzer `debugSingle` 则保留 runnable 的 Cargo 参数，添加 JSON 输出，并为测试添加 `--no-run`，构建后调试可执行文件。Go adapter 会使用所选配置的 `cwd` 启动 Delve。
 
 ## 与其他模块的关系
 

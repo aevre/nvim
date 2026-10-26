@@ -33,6 +33,8 @@ return {
 		})
 	end,
 	configurations = {
+		require("toolchain.debug.jest").configuration(false),
+		require("toolchain.debug.jest").configuration(true),
 		{
 			name = "Launch Node file",
 			type = "pwa-node",

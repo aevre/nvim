@@ -179,7 +179,7 @@ The table below lists the Conform formatter, CLI linter, and LSP declarations in
 | dart / dart | — | — | dartls |
 | go / go | goimports, gofumpt | golangcilint | gopls |
 | html / html | Web combination | — | html, emmet-language-server, stylelint-language-server, tailwindcss, biome, oxfmt |
-| java / java | — | — | jdtls (declaration only) |
+| java / java | — | — | jdtls (native LSP, isolated project workspace) |
 | javascript / javascript, javascriptreact | Web combination | eslint, oxlint (javascript only) | vtsls, biome, oxlint, cssmodules-language-server, oxfmt |
 | json / json, jsonc | Web combination | — | jsonls, biome, oxfmt |
 | kotlin / kotlin | — | — | kotlin-lsp |
@@ -257,7 +257,7 @@ LSPs are enabled by `FileType`: when a name mapping exists, the package must fir
 
 Language filetypes trigger the first `vim.lsp.enable(name)` call; the server is then enabled globally. Its own filetypes and root rules determine later attachments. For example, opening Go first enables gopls, which can then attach to `gomod`, `gowork`, and `gotmpl` buffers even though those types are not in the Go language specification.
 
-`lsp/emmylua.lua`, `lsp/nushell.lua`, and `lsp/stylua.lua` are not currently enabled by language specifications. Java declares `jdtls`, whose configuration is only `cmd = "jdtls"`; it has no project workspace or debugging integration.
+`lsp/emmylua.lua`, `lsp/nushell.lua`, and `lsp/stylua.lua` are not currently enabled by language specifications. Java uses native `vim.lsp` with layered multi-module/single-module roots, shared cache configuration, and a distinct hashed `-data` workspace per absolute project root. `JDTLS_JVM_ARGS` is forwarded as space-separated `--jvm-arg` values. `nvim-jdtls` is not installed; java-debug/vscode-java-test bundles and their Java-specific commands are not configured.
 
 ## Debugging
 
@@ -265,11 +265,11 @@ Debug specs in `lua/toolchain/debug/specs/*.lua` define an adapter table or fact
 
 `setup_debug(opts)` preserves native entries and is idempotent; `{ override = true }` overrides conflicts. `{ launch_json = false }` restores the previous provider, including the native current-working-directory provider. User-supplied providers are preserved by default. It reads nearest `.vscode/launch.json` per request, expands workspace variables, aliases `node` to `pwa-node`, and accepts both the standard `python`/`go` types and the legacy internal `debugpy`/`delve` names; it does not implement VS Code tasks/extensions or browser defaults. Toolchain prompts abort on empty/canceled input. Native launch.json inputs retain nvim-dap behavior: canceled prompts are not consistently converted to `dap.ABORT`. VS Code command variables, compounds, tasks and extension-specific launch fields are not implemented.
 
-GDB 14.1+ with Python/DAP support is required from the system, not Mason. GDB version validation and debugpy import validation are bounded by 3 seconds; missing or invalid adapters raise a clear error instead of leaving an asynchronous callback pending. Python chooses active `VIRTUAL_ENV`/`CONDA_PREFIX`, then project `.venv`/`venv`/`.env`/`env`, then system Python. Launch configurations also load the project `.env` file unless `envFile` overrides it. JS uses command wrappers or project `@vscode/js-debug`; TypeScript prompts for compiled JS. Vue supports attach only; start npm/pnpm inspector scripts manually. Cargo requires a built artifact and prompts for selection; there is no auto-build.
+GDB 14.1+ with Python/DAP support is required from the system, not Mason. GDB version validation and debugpy import validation are bounded by 3 seconds; missing or invalid adapters raise a clear error instead of leaving an asynchronous callback pending. Python chooses active `VIRTUAL_ENV`/`CONDA_PREFIX`, then project `.venv`/`venv`/`.env`/`env`, then system Python. Launch configurations also load the project `.env` file unless `envFile` overrides it. JS uses command wrappers or project `@vscode/js-debug`; TypeScript prompts for compiled JS. Jest file/test-name configurations require project-local Jest. Vue supports attach only; start npm/pnpm inspector scripts manually. Rust-analyzer's `debugSingle` builds the selected Cargo runnable with JSON output and launches the resulting executable through GDB.
 
-Mason derives packages per filetype from language maps; `extra_packages` defaults to empty. Only `nvim-dap` and `nvim-dap-view` plugins are added; test/coverage is not implemented.
+Mason derives packages per filetype from language maps; `extra_packages` defaults to empty. Only `nvim-dap` and `nvim-dap-view` plugins are added; no test-result or coverage framework is implemented.
 
-The 12 mappings are `<leader>dc` continue/start, `dp` pause, `dr` restart, `dt` terminate, `db` breakpoint, `dB` conditional breakpoint, `di` step into, `do` step over, `dO` step out, `dg` run to cursor, `du` toggle UI, and `de` REPL.
+The debug mappings include `<leader>dc` continue/start, `dl` run last, `dp` pause, `dr` restart, `dt` terminate, `db` breakpoint, `dB` conditional breakpoint, `di` step into, `do` step over, `dO` step out, `dg` run to cursor, `du` toggle UI, `de` REPL, and `dh` hover.
 
 ### Declarations and extension
 
@@ -314,16 +314,16 @@ Existing manual entries remain first; exact duplicate configurations are not app
 
 | Language | Adapter | Configurations |
 | --- | --- | --- |
-| C / C++ | GDB | Select executable, attach process |
-| Rust | GDB | Shared defaults plus Cargo artifact selection |
+| C / C++ | GDB | Select executable, attach process, select a built CTest command |
+| Rust | GDB | Shared defaults, manual Cargo artifact selection, rust-analyzer `debugSingle` build |
 | Go | Delve | Package, current file, package tests, current test, local process attach |
 | Python | debugpy | Current file, file with arguments, module, doctest, dynamic host/port attach |
-| JavaScript / TypeScript, including React filetypes | vscode-js-debug | Node launch, Node Inspector attach, source maps |
+| JavaScript / TypeScript, including React filetypes | vscode-js-debug | Node launch/attach, source maps, Jest file/test-name launch |
 | Vue / Nuxt | vscode-js-debug | Node Inspector attach only |
 
-GDB is the common Linux default for C/C++/Rust; LLDB can offer better macOS integration and Rust visualizers but needs a separate adapter spec. Compile native artifacts with debug symbols. Cargo selection respects metadata target paths but does not build or automatically load Rust pretty printers. Go current-file debugging only works for self-contained files; package tests run the package rather than discovering individual tests. Attach depends on OS permissions and adapter capabilities.
+GDB is the common Linux default for C/C++/Rust; LLDB can offer better macOS integration and Rust visualizers but needs a separate adapter spec. Compile native artifacts with debug symbols. The manual Cargo configuration selects existing metadata artifacts; rust-analyzer `debugSingle` instead builds its runnable and parses Cargo `compiler-artifact` JSON, but does not load Rust pretty printers. CTest discovery reads `ctest --show-only=json-v1` and launches the selected command directly, so it does not reproduce CTest fixtures, dependencies, or environment properties. Go current-file debugging only works for self-contained files; package tests run the package rather than discovering individual tests. Attach depends on OS permissions and adapter capabilities.
 
-Node attach prompts for the Inspector port (default 9229). Start the server with an appropriate `node --inspect` command or npm/pnpm script first. Nearest `package.json` determines package cwd in a monorepo; specify project cwd/env/args/runtime in launch.json where needed. TypeScript requires emitted JavaScript and source maps or a manually configured runtime/loader. JSX is not transpiled automatically. Vue SFCs are never launched as Node files; browser debugging is not configured.
+Node attach prompts for the Inspector port (default 9229). Start the server with an appropriate `node --inspect` command or npm/pnpm script first. Nearest `package.json` determines package cwd in a monorepo; specify project cwd/env/args/runtime in launch.json where needed. Jest launch searches upward for `node_modules/jest/bin/jest.js`, runs the current saved file, and optionally accepts a test-name regular expression; `<leader>dl` repeats the last selection. TypeScript breakpoint accuracy still depends on the project's transform/source-map setup. JSX is not transpiled automatically. Vue SFCs are never launched as Node files; browser debugging is not configured.
 
 The Python adapter process and target interpreter are separate: a Mason `debugpy-adapter` can debug a project's selected Python. Interpreter choice is active `VIRTUAL_ENV`/`CONDA_PREFIX`, project `.venv`/`venv`/`.env`/`env`, then PATH Python; override `pythonPath` or `python` for other environments. Program and module arguments use the shared DAP argument parser, which accepts empty input and preserves quoted values. Local JS discovery accepts an existing built `node_modules/@vscode/js-debug/src/dapDebugServer.js`; it does not build source checkouts. Mason's exported wrapper is preferred over internal package paths.
 
@@ -336,8 +336,7 @@ Default Go launch configurations set `outputMode = "remote"` to forward stdout/s
 ```sh
 stylua --check lua/toolchain lua/plugins/highlight/treesitter.lua lua/sources/language.lua
 git diff --check
-nvim --headless -u NONE -l tests/toolchain_regression.lua
-nvim --headless -u NONE -l tests/toolchain_debug.lua
+nvim --headless -u NONE -l tests/language_debug.lua
 ```
 
 A live Go/C session uses the actual harness environment, for example:
@@ -361,9 +360,9 @@ nvim --headless -u NONE \
 
 `<leader>cL` displays language names and filetypes; the preview displays the language specification source, and the default selection directly opens the corresponding `toolchain/lang/specs/<language-name>.lua` file.
 
-The regression test compares existing formatter/linter associations and package baseline, intentionally excluding the new debug packages. The actual Go Package, Current File, Package Tests, C GDB and Rust GDB sessions passed full breakpoint, continue, termination, and dap-view UI lifecycle checks. debugpy and js-debug-adapter were unavailable, so Python/JavaScript live sessions were not run and no packages were installed.
+`tests/language_debug.lua` checks Jest resolution/cancellation, CTest JSON command mapping, JDTLS workspace isolation, Rust Cargo JSON artifact conversion, and preservation of callable configurations through toolchain aggregation. The actual Go Package, Current File, Package Tests, C GDB and Rust GDB sessions previously passed full breakpoint, continue, termination, and dap-view UI lifecycle checks. debugpy, js-debug-adapter, JDTLS, and representative Jest/CTest projects were unavailable, so the new integrations have not been exercised in live sessions.
 
-For Rust, each Cargo launch invokes `cargo metadata --no-deps --format-version 1` with a 3-second timeout. Successful metadata supplies `workspace_root` and `target_directory`; otherwise the configuration falls back to the nearest Cargo root and `CARGO_TARGET_DIR` (or `<root>/target`). It selects an existing artifact and never builds it. The Go adapter starts Delve with the selected configuration's `cwd`.
+The manual Rust Cargo configuration still invokes `cargo metadata --no-deps --format-version 1` with a 3-second timeout and selects an existing artifact. The rust-analyzer `debugSingle` handler uses the runnable's exact Cargo arguments, adds JSON output and `--no-run` for tests, then launches the produced executable. The Go adapter starts Delve with the selected configuration's `cwd`.
 
 ## Relationship with Other Modules
 

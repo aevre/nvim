@@ -1,6 +1,6 @@
 ---@type LanguageSpec
 return {
-	debug = { "gdb" },
+	debug = { { adapter = "gdb", configurations = { require("toolchain.debug.ctest").configuration() } } },
 	filetypes = {
 		"cpp",
 	},

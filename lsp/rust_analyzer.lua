@@ -22,6 +22,105 @@ local function reload_workspace(bufnr)
 	end
 end
 
+---@class RustAnalyzerCargoRunnableArgs
+---@field cwd string
+---@field workspaceRoot string
+---@field cargoArgs string[]
+---@field cargoExtraArgs? string[]
+---@field executableArgs? string[]
+---@field environment? table<string, string>
+---@field overrideCargo? string
+
+---@param args RustAnalyzerCargoRunnableArgs
+---@param debugging? boolean
+---@return string[]
+local function cargo_command(args, debugging)
+	assert(type(args.cargoArgs) == "table", "Only Cargo runnables are supported")
+	local cargo_args = vim.deepcopy(args.cargoArgs)
+	if debugging then
+		if cargo_args[1] == "run" then
+			cargo_args[1] = "build"
+		elseif cargo_args[1] == "test" and not vim.list_contains(cargo_args, "--no-run") then
+			table.insert(cargo_args, "--no-run")
+		end
+		if not vim.list_contains(cargo_args, "--message-format=json") then
+			table.insert(cargo_args, "--message-format=json")
+		end
+	end
+	vim.list_extend(cargo_args, args.cargoExtraArgs or {})
+	return vim.list_extend({ args.overrideCargo or "cargo" }, cargo_args)
+end
+
+---@param stdout string
+---@param is_test boolean
+---@return string[]
+local function cargo_executables(stdout, is_test)
+	local executables = {}
+	for line in stdout:gmatch("[^\r\n]+") do
+		local ok, artifact = pcall(vim.json.decode, line)
+		if
+			ok
+			and type(artifact) == "table"
+			and artifact.reason == "compiler-artifact"
+			and type(artifact.executable) == "string"
+		then
+			local target = artifact.target or {}
+			local profile = artifact.profile or {}
+			local is_build_script = vim.list_contains(target.kind or {}, "custom-build")
+			local is_test_target = profile.test == true or vim.list_contains(target.kind or {}, "test")
+			if not is_build_script and is_test == is_test_target then
+				table.insert(executables, artifact.executable)
+			end
+		end
+	end
+	return executables
+end
+
+---@param args RustAnalyzerCargoRunnableArgs
+local function debug_runnable(args)
+	local command = cargo_command(args, true)
+	local cwd = args.cwd or args.workspaceRoot
+	Utils.log.info("Compiling Cargo target for debugging")
+	vim.system(command, { cwd = cwd, env = args.environment, text = true }, function(result)
+		if result.code ~= 0 then
+			vim.schedule(function()
+				Utils.log.error(result.stderr or "Cargo build failed")
+			end)
+			return
+		end
+
+		local executables = cargo_executables(result.stdout or "", args.cargoArgs[1] == "test")
+		vim.schedule(function()
+			if #executables == 0 then
+				Utils.log.error("Cargo produced no debuggable executable")
+				return
+			end
+
+			---@param program? string
+			local function launch(program)
+				if not program then
+					return
+				end
+				require("dap").run({
+					name = "Debug Cargo target",
+					type = "gdb",
+					request = "launch",
+					program = program,
+					cwd = cwd,
+					args = args.executableArgs or {},
+					env = args.environment,
+				})
+			end
+
+			if #executables == 1 then
+				launch(executables[1])
+			else
+				vim.ui.select(executables, { prompt = "Select Cargo executable" }, launch)
+			end
+		end)
+	end)
+end
+
 local function is_library(fname)
 	local user_home = vim.fs.normalize(vim.env.HOME)
 	local cargo_home = os.getenv("CARGO_HOME") or user_home .. "/.cargo"
@@ -108,23 +207,30 @@ return {
 		if config.settings and config.settings["rust-analyzer"] then
 			init_params.initializationOptions = config.settings["rust-analyzer"]
 		end
-		---@param command table{ title: string, command: string, arguments: any[] }
+		---@param command table{ title: string, command: string, arguments: table[] }
 		vim.lsp.commands["rust-analyzer.runSingle"] = function(command)
-			local r = command.arguments[1]
-			local cmd = { "cargo", unpack(r.args.cargoArgs) }
-			if r.args.executableArgs and #r.args.executableArgs > 0 then
-				vim.list_extend(cmd, { "--", unpack(r.args.executableArgs) })
+			---@type RustAnalyzerCargoRunnableArgs
+			local args = command.arguments[1].args
+			local cmd = cargo_command(args)
+			if args.executableArgs and #args.executableArgs > 0 then
+				vim.list_extend(cmd, { "--" })
+				vim.list_extend(cmd, args.executableArgs)
 			end
 
-			local proc = vim.system(cmd, { cwd = r.args.cwd, env = r.args.environment })
+			vim.system(cmd, { cwd = args.cwd, env = args.environment, text = true }, function(result)
+				vim.schedule(function()
+					if result.code == 0 then
+						Utils.log.info(result.stdout or "Cargo command completed")
+					else
+						Utils.log.error(result.stderr or "Cargo command failed")
+					end
+				end)
+			end)
+		end
 
-			local result = proc:wait()
-
-			if result.code == 0 then
-				Utils.log.info(result.stdout or "result stdout empty")
-			else
-				Utils.log.error(result.stderr or "result stderr empty")
-			end
+		---@param command table{ title: string, command: string, arguments: table[] }
+		vim.lsp.commands["rust-analyzer.debugSingle"] = function(command)
+			debug_runnable(command.arguments[1].args)
 		end
 	end,
 	on_attach = function(_, bufnr)

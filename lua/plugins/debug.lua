@@ -32,6 +32,13 @@ return {
 			desc = "Continue / Start",
 		},
 		{
+			"<leader>dl",
+			function()
+				require("dap").run_last()
+			end,
+			desc = "Run Last Debug",
+		},
+		{
 			"<leader>dp",
 			function()
 				require("dap").pause()

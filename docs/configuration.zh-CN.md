@@ -35,7 +35,7 @@ cmdline.nvim 启用命令行弹窗、消息/搜索通知视图和 NUI popup menu
 
 LSP 使用 `lsp/<名称>.lua` 和 `vim.lsp.enable()`。打开 filetype 时读取语言规格；有 Mason 名称映射的服务只有在对应 Mason 包已安装时才会启用，没有映射的名称直接通过这一检查。PATH 中存在同名服务并不能绕过已映射服务的 Mason 门槛。服务还需满足自身 filetype、root 和命令条件。
 
-Mason 在 `VeryLazy` 刷新注册表并安装缺失包；安装成功后重新尝试已打开 buffer 的 LSP。当前自定义 `config` 直接使用 Mason registry，并未调用 mason-lspconfig 的 `setup()`。Java 声明了 `jdtls`，但 `lsp/jdtls.lua` 仅设置 `cmd = "jdtls"`，nvim-jdtls spec 也只有 `ft = "java"`；项目 workspace 和调试集成需要另行配置。
+Mason 在 `VeryLazy` 刷新注册表并安装缺失包；安装成功后重新尝试已打开 buffer 的 LSP。当前自定义 `config` 直接使用 Mason registry，并未调用 mason-lspconfig 的 `setup()`。Java 使用原生 `vim.lsp`，包含多模块/单模块 root markers、共享 JDTLS cache configuration，以及按项目绝对路径散列的独立 `-data` workspace；`JDTLS_JVM_ARGS` 接受以空格分隔的 JVM 参数。不再安装 `nvim-jdtls`；Java 调试、测试发现、classfile buffer 和扩展重构仍需另行接入 java-debug/vscode-java-test。
 
 Conform 的 `<leader>cf` 异步格式化，默认超时配置为 3000ms，允许 LSP fallback。没有设置 `format_on_save`。Web formatter 按 `prettier → biome → oxfmt` 的声明顺序筛选并执行可用项，不是严格三选一；Python 同样声明了 `ruff_format → isort → yapf`，Go 为 `goimports → gofumpt`。
 
