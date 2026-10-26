@@ -11,11 +11,13 @@ return {
 	adapter = function(callback)
 		local command = ctx.command("gdb")
 		assert(command, "GDB is unavailable; install GDB 14.1+ with Python/DAP support")
-		local result = vim.system({ command, "--version" }, { text = true }):wait(3000)
-		local major, minor = (result.stdout or ""):match("(%d+)%.(%d+)")
+		local ok, result = pcall(function()
+			return vim.system({ command, "--version" }, { text = true }):wait(3000)
+		end)
+		local major, minor = ok and (result.stdout or ""):match("(%d+)%.(%d+)")
 		major, minor = tonumber(major), tonumber(minor)
 		assert(
-			result.code == 0 and major and (major > 14 or (major == 14 and minor >= 1)),
+			ok and result.code == 0 and major and (major > 14 or (major == 14 and minor >= 1)),
 			"GDB 14.1+ with Python/DAP support is required"
 		)
 		callback({ type = "executable", command = command, args = { "--quiet", "--interpreter=dap" } })
@@ -29,6 +31,7 @@ return {
 				return ctx.program(root() .. "/")
 			end,
 			cwd = root,
+			args = ctx.arguments,
 			stopAtBeginningOfMainSubprogram = false,
 		},
 		{

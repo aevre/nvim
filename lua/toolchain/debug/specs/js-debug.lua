@@ -44,6 +44,7 @@ return {
 				return vim.api.nvim_buf_get_name(0)
 			end,
 			cwd = root,
+			args = ctx.arguments,
 			runtimeExecutable = function()
 				return ctx.command("node") or require("dap").ABORT
 			end,
