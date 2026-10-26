@@ -5,7 +5,7 @@ return {
 	version = "*",
 	dependencies = "saghen/blink.lib",
 	build = function()
-		require("blink.pairs").download():pwait(60000)
+		require("blink.pairs").download():pwait()
 	end,
 
 	---@type blink.pairs.Config
