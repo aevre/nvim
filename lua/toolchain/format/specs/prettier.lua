@@ -13,6 +13,9 @@ local configs = {
 ---@type FormatSpec
 return {
 	formatter = {
+		---@param _ conform.FormatterConfig
+		---@param ctx { filename: string }
+		---@return boolean
 		condition = function(_, ctx)
 			return #vim.fs.find(configs, {
 				path = vim.fs.dirname(ctx.filename),

@@ -1,3 +1,6 @@
+---@param ctx { filename: string }
+---@param names string[]
+---@return boolean
 local function has_any_config(ctx, names)
 	return #vim.fs.find(names, {
 		path = vim.fs.dirname(ctx.filename),
@@ -30,6 +33,9 @@ local biome_configs = { "biome.json", "biome.jsonc" }
 ---@type FormatSpec
 return {
 	formatter = {
+		---@param _ conform.FormatterConfig
+		---@param ctx { filename: string }
+		---@return boolean
 		condition = function(_, ctx)
 			if has_any_config(ctx, configs) then
 				return true

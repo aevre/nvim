@@ -5,19 +5,35 @@
 
 ---@class DebugSpec
 ---@field type? string DAP type; defaults to the spec filename.
----@field adapter dap.Adapter|fun(callback: fun(adapter: dap.Adapter), config: dap.Configuration, parent?: dap.Session)
+---@field adapter dap.Adapter|dap.AdapterFactory
 ---@field configurations dap.Configuration[]
 
+---@class ToolchainDebugSetupOptions
+---@field override? boolean Replace entries currently registered with nvim-dap.
+---@field launch_json? boolean Install the `.vscode/launch.json` provider (enabled by default).
+
+---@alias ToolchainDebugAdapters table<string, dap.Adapter|dap.AdapterFactory>
+---@alias ToolchainDebugConfigurations table<string, dap.Configuration[]>
+
+---@class ToolchainDebug
 local M = {}
+---@type table<string, DebugSpec>
 local specs = require("toolchain.specs").load("debug", function(spec)
 	local adapter_valid = type(spec.adapter) == "function"
 		or (type(spec.adapter) == "table" and vim.tbl_contains({ "executable", "server", "pipe" }, spec.adapter.type))
 	return adapter_valid and vim.islist(spec.configurations) and (spec.type == nil or type(spec.type) == "string")
 end)
-local owned_provider, previous_provider
+---@type fun(bufnr: integer): dap.Configuration[]|nil
+local owned_provider
+---@type fun(bufnr: integer): dap.Configuration[]|nil
+local previous_provider
+---@type table<string, dap.Adapter|dap.AdapterFactory>
 local owned_adapters = {}
+---@type table<dap.Configuration, boolean>
 local owned_configs = setmetatable({}, { __mode = "k" })
 
+---@param value string|LanguageDebug
+---@return LanguageDebug
 local function declaration(value)
 	if type(value) == "string" then
 		return { adapter = value }
@@ -28,6 +44,9 @@ local function declaration(value)
 	return value
 end
 
+---@param languages table<string, LanguageSpec>
+---@return ToolchainDebugAdapters adapters Adapters keyed by DAP type.
+---@return ToolchainDebugConfigurations configurations Configurations keyed by filetype.
 function M.resolve(languages)
 	local adapters, configurations = {}, {}
 	local names = vim.tbl_keys(languages)
@@ -69,7 +88,7 @@ function M.resolve(languages)
 end
 
 -- Preserve manual entries; only replace configurations still owned by this module.
----@param opts? { override?: boolean, launch_json?: boolean }
+---@param opts? ToolchainDebugSetupOptions
 function M.setup(opts)
 	opts = opts or {}
 	local dap = require("dap")
@@ -113,7 +132,7 @@ function M.setup(opts)
 		if provider ~= owned_provider then
 			previous_provider = provider
 		end
-		-- Read on demand: switching projects never accumulates launch configurations.
+		-- Read on demand so project changes do not accumulate launch configurations.
 		owned_provider = function(bufnr)
 			local ctx = require("toolchain.debug.context")
 			local root = ctx.root({ ".vscode" }, bufnr)
@@ -126,7 +145,7 @@ function M.setup(opts)
 				vim.notify("Invalid " .. path .. ": " .. tostring(configs), vim.log.levels.ERROR)
 				return {}
 			end
-			local aliases = { node = "pwa-node", python = "debugpy", go = "delve" }
+			local aliases = { node = "pwa-node", debugpy = "python", delve = "go" }
 			for _, config in ipairs(configs) do
 				config.type = aliases[config.type] or config.type
 				local function expand(value)
@@ -155,4 +174,5 @@ function M.setup(opts)
 	end
 end
 
+---@cast M ToolchainDebug
 return M

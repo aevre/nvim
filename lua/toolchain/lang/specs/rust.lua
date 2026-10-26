@@ -1,3 +1,5 @@
+---@return string workspace_root Cargo workspace root.
+---@return string target_directory Cargo artifact directory.
 local function cargo()
 	local ctx = require("toolchain.debug.context")
 	local root = ctx.root({ "Cargo.toml", ".git" })
@@ -24,6 +26,7 @@ return {
 			configurations = {
 				{
 					name = "Launch Cargo build artifact",
+					type = "gdb",
 					request = "launch",
 					program = function()
 						local ctx = require("toolchain.debug.context")

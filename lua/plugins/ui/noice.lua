@@ -5,7 +5,6 @@ return {
 	lazy = false,
 	enabled = false,
 
-	---@type NoiceConfig
 	opts = {
 		notify = {
 			enabled = true,

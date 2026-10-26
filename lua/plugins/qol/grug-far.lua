@@ -4,7 +4,7 @@ return {
 	"MagicDuck/grug-far.nvim",
 	cmd = { "GrugFar", "GrugFarWithin" },
 
-	---@type grug.far.Options
+	---@type grug.far.OptionsOverride
 	opts = {
 		engines = {
 			ripgrep = {

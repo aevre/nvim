@@ -1,11 +1,15 @@
 ---@class LanguageSpec
----@field filetypes string[] Filetypes.
----@field formatters? string[] Formatter names.
----@field linters? string[] Linter names.
----@field lint_filetypes? string[] Filetypes where lint runs.
----@field lsp? string[] LSP configuration names.
+---@field filetypes string[] Neovim filetypes owned by this language declaration.
+---@field formatters? string[] Conform formatter names.
+---@field linters? string[] nvim-lint linter names.
+---@field lint_filetypes? string[] Optional subset of `filetypes` where linting runs.
+---@field lsp? string[] Neovim LSP configuration names.
 ---@field treesitter? string[] Treesitter parser names.
 ---@field debug? (string|LanguageDebug)[] Debug adapter declarations.
+
+---@class ToolchainTreesitter
+---@field parsers string[] Deduplicated parser names.
+---@field filetypes string[] Filetypes that should start Treesitter on demand.
 
 ---@class LanguageSourceItem
 ---@field name string Language spec filename.
@@ -15,9 +19,11 @@
 ---@field linters string Linters for display.
 ---@field lsp string LSPs for display.
 
+---@class ToolchainLanguage
 local M = {}
 local specs_dir = vim.fs.joinpath(vim.fn.stdpath("config"), "lua", "toolchain", "lang", "specs")
 
+---@type table<string, LanguageSpec>
 local languages = require("toolchain.specs").load("lang", function(spec)
 	for _, field in ipairs({ "filetypes", "formatters", "linters", "lint_filetypes", "lsp", "treesitter" }) do
 		if spec[field] ~= nil then
@@ -32,15 +38,22 @@ local languages = require("toolchain.specs").load("lang", function(spec)
 		end
 	end
 	return spec.filetypes ~= nil and (spec.debug == nil or vim.islist(spec.debug))
-end) ---@type table<string, LanguageSpec>
-local lsp_enabled = {} ---@type table<string, boolean>
+end)
+---@type table<string, boolean>
+local lsp_enabled = {}
 
+---@generic T
+---@param list T[]
+---@param value T
 local function add_unique(list, value)
 	if not vim.tbl_contains(list, value) then
 		list[#list + 1] = value
 	end
 end
 
+---@generic T
+---@param list T[]
+---@param values T[]
 local function extend_unique(list, values)
 	for _, value in ipairs(values) do
 		add_unique(list, value)
@@ -55,8 +68,9 @@ local function each_filetype(definition, callback)
 	end
 end
 
----@param field string
----@param filetypes_field? string
+---Collect a string-list field into independent, deduplicated lists per filetype.
+---@param field "formatters"|"linters"
+---@param filetypes_field? "lint_filetypes"
 ---@return table<string, string[]>
 local function collect_by_filetype(field, filetypes_field)
 	local result = {}
@@ -103,7 +117,7 @@ function M.get_linters()
 	return collect_by_filetype("linters", "lint_filetypes")
 end
 
----@return { parsers: string[], filetypes: string[] }
+---@return ToolchainTreesitter
 function M.get_treesitter()
 	local result = {
 		parsers = {},
@@ -137,6 +151,7 @@ function M.enable_lsp(filetype)
 	end
 end
 
+---Enable language servers for buffers loaded before toolchain setup completed.
 function M.enable_for_open_buffers()
 	for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
 		if vim.api.nvim_buf_is_loaded(bufnr) then
@@ -157,9 +172,12 @@ function M.setup()
 	M.enable_lsp(vim.bo.filetype)
 end
 
+---Merge every language declaration that includes `filetype`.
+---The returned table is detached from the cached specifications.
 ---@param filetype string
 ---@return LanguageSpec?
 function M.get_by_filetype(filetype)
+	---@type LanguageSpec?
 	local result
 	for _, definition in pairs(languages) do
 		if not vim.tbl_contains(definition.filetypes, filetype) then
@@ -206,4 +224,5 @@ function M.source_items()
 	return items
 end
 
+---@cast M ToolchainLanguage
 return M

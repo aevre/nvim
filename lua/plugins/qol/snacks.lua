@@ -5,7 +5,6 @@ return {
 	enabled = false,
 	lazy = false,
 
-	---@type snacks.Config
 	opts = {
 		picker = {
 			enabled = false,

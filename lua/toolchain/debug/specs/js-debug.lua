@@ -1,4 +1,6 @@
 local ctx = require("toolchain.debug.context")
+
+---@return string
 local function root()
 	return ctx.root({ "package.json", ".git" })
 end
@@ -6,6 +8,7 @@ end
 ---@type DebugSpec
 return {
 	type = "pwa-node",
+	---@param callback fun(adapter: dap.Adapter)
 	adapter = function(callback)
 		local command = ctx.command("js-debug-adapter")
 		local args = { "${port}", "127.0.0.1" }

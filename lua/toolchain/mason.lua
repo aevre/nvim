@@ -1,6 +1,7 @@
 local M = {}
 
 -- Runtime tool names and Mason package names are separate namespaces.
+---@type table<string, string>
 local packages = {
 	-- LSP
 	["bash-language-server"] = "bash-language-server",
@@ -60,6 +61,9 @@ local packages = {
 -- Auxiliary packages are always included, even without a language match.
 M.extra_packages = {}
 
+---@param result string[]
+---@param seen table<string, boolean>
+---@param name string Runtime tool or adapter ID.
 local function add(result, seen, name)
 	local package = packages[name]
 	if package and not seen[package] then
@@ -68,8 +72,9 @@ local function add(result, seen, name)
 	end
 end
 
----@param name string
----@return boolean
+---Tools without a Mason mapping are considered externally managed.
+---@param name string Runtime tool or adapter ID.
+---@return boolean installed
 function M.is_installed(name)
 	local package = packages[name]
 	if not package then
@@ -82,7 +87,9 @@ end
 ---@param filetype string
 ---@return string[]
 function M.get_packages(filetype)
+	---@type string[]
 	local result = {}
+	---@type table<string, boolean>
 	local seen = {}
 	for _, package in ipairs(M.extra_packages) do
 		if not seen[package] then

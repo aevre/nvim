@@ -12,6 +12,8 @@ local configs = {
 ---@type LintSpec
 return {
 	linter = {
+		---@param ctx LintContext
+		---@return boolean
 		condition = function(ctx)
 			return #vim.fs.find(configs, {
 				path = ctx.dirname,

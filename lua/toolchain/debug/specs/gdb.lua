@@ -1,10 +1,13 @@
 local ctx = require("toolchain.debug.context")
+
+---@return string
 local function root()
 	return ctx.root({ "Cargo.toml", "CMakeLists.txt", "Makefile", ".git" })
 end
 
 ---@type DebugSpec
 return {
+	---@param callback fun(adapter: dap.Adapter)
 	adapter = function(callback)
 		local command = ctx.command("gdb")
 		assert(command, "GDB is unavailable; install GDB 14.1+ with Python/DAP support")

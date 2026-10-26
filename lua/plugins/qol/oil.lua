@@ -68,6 +68,7 @@ return {
 		local function new_git_status()
 			return setmetatable({}, {
 				__index = function(self, dir)
+					---@cast dir string
 					local ignore_proc = vim.system(
 						{ "git", "ls-files", "--ignored", "--exclude-standard", "--others", "--directory" },
 						{ cwd = dir, text = true }
@@ -150,7 +151,7 @@ return {
 			pattern = "OilEnter",
 			callback = function()
 				for index = vim.fn.argc() - 1, 0, -1 do
-					local arg = vim.fn.argv(index)
+					local arg = vim.fn.argv(index) ---@cast arg string
 					if vim.fn.isdirectory(arg) == 1 or vim.startswith(arg, "oil://") then
 						vim.cmd((index + 1) .. "argdelete")
 					end

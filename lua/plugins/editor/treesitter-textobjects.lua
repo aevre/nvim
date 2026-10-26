@@ -8,7 +8,7 @@ return {
 		vim.g.no_plugin_maps = true
 	end,
 	config = function()
-		---@type TSTextObjects.Config
+		---@type TSTextObjects.UserConfig
 		local opts = {
 			move = {
 				set_jumps = true,

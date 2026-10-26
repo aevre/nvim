@@ -2,7 +2,6 @@
 return {
 	"rcarriga/nvim-notify",
 	enabled = false,
-	---@type notify.Config
 	opts = {
 		max_width = 50,
 		background_colour = "#000000",

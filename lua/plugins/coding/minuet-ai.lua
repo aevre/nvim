@@ -2,8 +2,8 @@
 return {
 	"milanglacier/minuet-ai.nvim",
 	event = "BufEdit",
-	---@type minuet.DuetConfig
 	opts = {
+		auto_trigger = {},
 		provider = "openai_compatible",
 
 		provider_options = {
