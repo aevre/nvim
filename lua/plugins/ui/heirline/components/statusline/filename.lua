@@ -6,6 +6,7 @@ return {
 		self.filepath = path
 		local filename = vim.fn.fnamemodify(path, ":t")
 		self.filename = filename == "" and "[No Name]" or filename
+		self.icon_filename = self.filename
 	end,
 	{ provider = " " },
 	common.FileIcon,
