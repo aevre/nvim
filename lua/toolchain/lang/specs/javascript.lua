@@ -1,5 +1,6 @@
 ---@type LanguageSpec
 return {
+	debug = { "js-debug" },
 	filetypes = { "javascript", "javascriptreact" },
 	formatters = { "prettier", "biome", "oxfmt" },
 	linters = { "eslint", "oxlint" },

@@ -20,11 +20,10 @@ vim.api.nvim_create_autocmd("FileType", {
 		"checkhealth", -- 健康检查
 		"copilot", -- Copilot
 		"dap-repl", -- DAP REPL
-		"dapui_breakpoints", -- DAP UI 断点
-		"dapui_console", -- DAP UI 控制台
-		"dapui_scopes", -- DAP UI 作用域
-		"dapui_stacks", -- DAP UI 堆栈
-		"dapui_watches", -- DAP UI 监视
+		"dap-view", -- DAP views
+		"dap-view-help", -- DAP view help
+		"dap-view-hover", -- DAP hover
+		"dap-view-term", -- DAP terminal
 		"dbout",
 		"diff", -- 差异比较
 		"dirvish", -- 目录浏览

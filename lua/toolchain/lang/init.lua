@@ -1,26 +1,39 @@
 ---@class LanguageSpec
----@field filetypes string[] 文件类型
----@field formatters? string[] 格式化器名称
----@field linters? string[] lint 名称
----@field lint_filetypes? string[] 实际启用 lint 的文件类型
----@field lsp? string[] LSP 配置名称
----@field treesitter? string[] Treesitter 语言名称
+---@field filetypes string[] Filetypes.
+---@field formatters? string[] Formatter names.
+---@field linters? string[] Linter names.
+---@field lint_filetypes? string[] Filetypes where lint runs.
+---@field lsp? string[] LSP configuration names.
+---@field treesitter? string[] Treesitter parser names.
+---@field debug? (string|LanguageDebug)[] Debug adapter declarations.
 
 ---@class LanguageSourceItem
----@field name string 语言规格文件名
----@field file string 语言规格文件路径
----@field filetypes string 用于展示的文件类型
----@field formatters string 用于展示的 formatter
----@field linters string 用于展示的 linter
----@field lsp string 用于展示的 LSP
+---@field name string Language spec filename.
+---@field file string Language spec path.
+---@field filetypes string Filetypes for display.
+---@field formatters string Formatters for display.
+---@field linters string Linters for display.
+---@field lsp string LSPs for display.
 
 local M = {}
 local specs_dir = vim.fs.joinpath(vim.fn.stdpath("config"), "lua", "toolchain", "lang", "specs")
 
-local languages = {} ---@type table<string, LanguageSpec>
+local languages = require("toolchain.specs").load("lang", function(spec)
+	for _, field in ipairs({ "filetypes", "formatters", "linters", "lint_filetypes", "lsp", "treesitter" }) do
+		if spec[field] ~= nil then
+			if not vim.islist(spec[field]) or (field == "filetypes" and #spec[field] == 0) then
+				return false
+			end
+			for _, value in ipairs(spec[field]) do
+				if type(value) ~= "string" or value == "" then
+					return false
+				end
+			end
+		end
+	end
+	return spec.filetypes ~= nil and (spec.debug == nil or vim.islist(spec.debug))
+end) ---@type table<string, LanguageSpec>
 local lsp_enabled = {} ---@type table<string, boolean>
-
-local spec_names = {}
 
 local function add_unique(list, value)
 	if not vim.tbl_contains(list, value) then
@@ -67,23 +80,6 @@ local function collect_by_filetype(field, filetypes_field)
 	return result
 end
 
-for name, kind in vim.fs.dir(specs_dir) do
-	if kind == "file" and name:sub(-4) == ".lua" then
-		spec_names[#spec_names + 1] = name:sub(1, -5)
-	end
-end
-
-table.sort(spec_names)
-
-for _, name in ipairs(spec_names) do
-	local ok, definition = pcall(require, "toolchain.lang.specs." .. name)
-	if ok and type(definition) == "table" and vim.islist(definition.filetypes) and #definition.filetypes > 0 then
-		languages[name] = definition
-	else
-		vim.notify(("Invalid language specification: %s.lua"):format(name), vim.log.levels.WARN)
-	end
-end
-
 ---@return table<string, LanguageSpec>
 function M.get()
 	return vim.deepcopy(languages)
@@ -126,7 +122,7 @@ function M.get_treesitter()
 	return result
 end
 
----仅在打开对应文件类型时启用该语言声明的 LSP。
+---Enable declared LSPs only when opening a matching filetype.
 ---@param filetype string
 function M.enable_lsp(filetype)
 	local definition = M.get_by_filetype(filetype)
@@ -149,7 +145,7 @@ function M.enable_for_open_buffers()
 	end
 end
 
----注册按文件类型延迟启用 LSP 的入口。
+---Register lazy LSP activation by filetype.
 function M.setup()
 	local group = vim.api.nvim_create_augroup("LanguageLsp", { clear = true })
 	vim.api.nvim_create_autocmd("FileType", {
@@ -179,6 +175,7 @@ function M.get_by_filetype(filetype)
 			"linters",
 			"lsp",
 			"treesitter",
+			"debug",
 		}) do
 			if definition[field] then
 				result[field] = result[field] or {}

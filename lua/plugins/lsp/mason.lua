@@ -54,6 +54,7 @@ return {
 						local package = mr.get_package(tool)
 						if not package:is_installed() and not package:is_installing() then
 							pending = pending + 1
+							vim.notify(("Installing %s…"):format(tool), vim.log.levels.INFO, { title = "Mason" })
 							package:install(nil, function()
 								pending = pending - 1
 								ready()

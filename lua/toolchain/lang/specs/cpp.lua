@@ -1,5 +1,6 @@
 ---@type LanguageSpec
 return {
+	debug = { "gdb" },
 	filetypes = {
 		"cpp",
 	},

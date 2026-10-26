@@ -27,7 +27,7 @@ local prettier_configs = {
 
 local biome_configs = { "biome.json", "biome.jsonc" }
 
----@type ToolSpec
+---@type FormatSpec
 return {
 	formatter = {
 		condition = function(_, ctx)

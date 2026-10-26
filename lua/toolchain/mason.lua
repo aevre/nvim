@@ -1,6 +1,6 @@
 local M = {}
 
--- 规格中的名称是 Neovim/Conform/nvim-lint 名称，Mason 使用自己的包名。
+-- Runtime tool names and Mason package names are separate namespaces.
 local packages = {
 	-- LSP
 	["bash-language-server"] = "bash-language-server",
@@ -30,6 +30,11 @@ local packages = {
 	["nushell"] = "nushell",
 	["qmlls"] = "qmlls",
 
+	-- Debug adapter IDs are independent of executables and DAP types.
+	["delve"] = "delve",
+	["debugpy"] = "debugpy",
+	["js-debug"] = "js-debug-adapter",
+
 	-- Formatter and lint
 	["biome"] = "biome",
 	["clang_format"] = "clang-format",
@@ -51,6 +56,9 @@ local packages = {
 	["yapf"] = "yapf",
 	["golangcilint"] = "golangci-lint",
 }
+
+-- Auxiliary packages are always included, even without a language match.
+M.extra_packages = {}
 
 local function add(result, seen, name)
 	local package = packages[name]
@@ -76,14 +84,17 @@ end
 function M.get_packages(filetype)
 	local result = {}
 	local seen = {}
-	local definition = require("toolchain").lang.get_by_filetype(filetype)
-	if not definition then
-		return result
+	for _, package in ipairs(M.extra_packages) do
+		if not seen[package] then
+			seen[package] = true
+			result[#result + 1] = package
+		end
 	end
+	local definition = require("toolchain").lang.get_by_filetype(filetype) or {}
 
-	for _, field in ipairs({ "lsp", "formatters", "linters" }) do
+	for _, field in ipairs({ "lsp", "formatters", "linters", "debug" }) do
 		for _, name in ipairs(definition[field] or {}) do
-			add(result, seen, name)
+			add(result, seen, type(name) == "table" and name.adapter or name)
 		end
 	end
 

@@ -7,7 +7,7 @@
 `lua/toolchain` is the unified entry point for language and development tool configuration:
 
 - `toolchain/lang/specs/*.lua` describes languages, filetypes, LSPs, Treesitter, and the formatter/linter names used by each language.
-- `toolchain/tool/specs/*.lua` describes the availability conditions and Conform configuration for each tool, such as whether the tool's configuration file exists in the project.
+- `toolchain/format/specs/*.lua` and `toolchain/lint/specs/*.lua` describe tool conditions (`formatter` and `linter` fields respectively). `toolchain/specs.lua` automatically discovers `.lua` files in language, format, lint, and debug spec directories.
 - `toolchain/mason.lua` maps LSP, formatter, and linter names to Mason package names, while also keeping debugging and auxiliary tools.
 - `toolchain/init.lua` aggregates these configurations for use by LSP, Conform, nvim-lint, Mason, Treesitter, and the fzf source.
 
@@ -20,33 +20,36 @@ The public entry point is provided by `require("toolchain")`:
 | `get_formatter_configs()` | Returns the Conform formatter conditions provided by tool specifications. |
 | `get_linters()` | Aggregates `filetype -> linter[]` from language specifications. |
 | `get_linter_configs()` | Returns the nvim-lint linter conditions provided by tool specifications. |
+| `setup_debug(opts)` | Registers adapters/configurations and optional project provider. |
 | `get_treesitter()` | Returns the parsers declared by language specifications and the filetypes used to start those parsers. |
 | `get_language_by_filetype(ft)` | Merges the language specifications declaring that filetype; returns nil when none exists. |
-| `get_mason_packages()` | Returns the Mason package names corresponding to language tools and extra tools. |
+| `get_mason_packages(ft)` | Returns the Mason package names corresponding to language tools and extra tools. |
 
-Language specifications only describe the relationship between languages and tools; tool conditions, LSP startup arguments, and UI behavior are handled respectively by `tool/specs/`, `lsp/`, and plugin configuration.
+Language specifications only describe the relationship between languages and tools; tool conditions, LSP startup arguments, and UI behavior are handled respectively by `format/specs/` / `lint/specs/`, `lsp/`, and plugin configuration.
 
 ## Directory Structure
 
 ```text
 lua/toolchain/
 ├── init.lua
+├── specs.lua
 ├── mason.lua
 ├── lang/
 │   ├── init.lua
-│   └── specs/
-│       ├── lua.lua
-│       ├── python.lua
-│       └── ...
-└── tool/
+│   └── specs/*.lua
+├── format/
+│   ├── init.lua
+│   └── specs/*.lua
+├── lint/
+│   ├── init.lua
+│   └── specs/*.lua
+└── debug/
     ├── init.lua
-    └── specs/
-        ├── prettier.lua
-        ├── biome.lua
-        └── oxfmt.lua
+    ├── context.lua
+    └── specs/*.lua
 ```
 
-The `.lua` files in the language and tool specification directories are scanned automatically. Do not put template Lua files, test files, or Lua files returning non-specification content in these two `specs/` directories, or they will be loaded as configuration at startup and produce warnings. Keep toolchain documentation in `docs/` and templates outside the specification directories or in Markdown files.
+The `.lua` files in the language and tool specification directories are scanned automatically. Do not put template Lua files, test files, or Lua files returning non-specification content in any `specs/` directory; malformed specifications fail with their source identified. Keep toolchain documentation in `docs/` and templates outside the specification directories or in Markdown files.
 
 ## Language Specifications
 
@@ -73,6 +76,7 @@ Supported fields:
 | `linters` | `string[]` | The nvim-lint linter names for the language. |
 | `lint_filetypes` | `string[]` | The filetypes on which linting actually runs; uses `filetypes` when omitted. |
 | `lsp` | `string[]` | The LSP names to enable on demand when opening the corresponding filetype. |
+| `debug` | `(string|LanguageDebug)[]` | Adapter IDs or explicit language configurations. |
 | `treesitter` | `string[]` | The Treesitter parser names to install and enable. |
 
 Use the array form even when there is only one value, such as `{ "stylua" }`. When multiple language specifications declare the same filetype, formatter, linter, LSP, and Treesitter aggregate queries deduplicate the results.
@@ -103,7 +107,7 @@ local configs = {
 	"prettier.config.js",
 }
 
----@type ToolSpec
+---@type FormatSpec
 return {
 	formatter = {
 		condition = function(_, ctx)
@@ -128,9 +132,9 @@ Current optional formatter conditions:
 These conditions are located in:
 
 ```text
-lua/toolchain/tool/specs/prettier.lua
-lua/toolchain/tool/specs/biome.lua
-lua/toolchain/tool/specs/oxfmt.lua
+lua/toolchain/format/specs/prettier.lua
+lua/toolchain/format/specs/biome.lua
+lua/toolchain/format/specs/oxfmt.lua
 ```
 
 Configuration detection searches upward from the current file's directory, with the home directory as the stop boundary, and only recognizes the filenames listed in each tool spec. It does not inspect `package.json` fields; unlisted names such as `.prettierrc.cjs` or `eslint.config.ts` are not recognized. An unrecognized Prettier configuration therefore does not prevent Oxfmt's fallback.
@@ -147,8 +151,8 @@ Current linters with project configuration conditions:
 These conditions are located in:
 
 ```text
-lua/toolchain/tool/specs/eslint.lua
-lua/toolchain/tool/specs/oxlint.lua
+lua/toolchain/lint/specs/eslint.lua
+lua/toolchain/lint/specs/oxlint.lua
 ```
 
 When changing linter configuration file detection rules, modify only the corresponding tool specification. Do not write the condition logic back into `lua/plugins/linter.lua`. The latter is responsible for merging configuration, filtering tools, and triggering linting.
@@ -216,7 +220,7 @@ Using the addition of Zig as an example:
 2. Create `lua/toolchain/lang/specs/zig.lua` with at least `filetypes`.
 3. Add `formatters`, `linters`, `lsp`, and `treesitter` as needed.
 4. If the LSP name has no corresponding `lsp/<name>.lua`, create that file.
-5. If the tool needs a configuration file condition, add or modify the corresponding tool specification in `toolchain/tool/specs/`.
+5. If the tool needs a configuration file condition, add or modify the corresponding specification in `toolchain/format/specs/` or `toolchain/lint/specs/`.
 6. For tools that Mason should install automatically, add explicit name mappings in `lua/toolchain/mason.lua`, even when the runtime and package names are identical.
 7. Open a file in that language and verify LSP, formatting, linting, and Treesitter behavior.
 
@@ -226,7 +230,7 @@ Adding a language does not require modifying the language list or manually addin
 
 - Change the relationship between a language and filetypes: modify `filetypes` in `toolchain/lang/specs/*.lua`.
 - Change which tools a language uses: modify `formatters` or `linters` in the language specification.
-- Change whether a tool is available: modify the condition in `toolchain/tool/specs/<tool>.lua`.
+- Change whether a formatter or linter is available: modify its `formatter` or `linter` field in `toolchain/format/specs/<tool>.lua` or `toolchain/lint/specs/<tool>.lua`.
 - Change the LSP command, root, or settings: modify `lsp/<name>.lua`.
 - Change the Treesitter parser/filetype: modify `treesitter` / `filetypes` in the language specification.
 - Change the Treesitter startup, installation, and retry mechanism: modify `lua/plugins/highlight/treesitter.lua`.
@@ -236,7 +240,7 @@ Do not write project paths into language or tool specifications; these specifica
 
 ## Mason Automatic Installation
 
-The Mason registry callback at the `VeryLazy` stage calls `toolchain.get_mason_packages()` and installs the corresponding packages for LSPs, formatters, and linters that are actually declared in the current language specifications and have name mappings. This is not an installation list limited to currently open languages. Mason package names and runtime names may differ, for example:
+After the Mason registry refresh at `VeryLazy`, open buffers and subsequent `FileType` events call `toolchain.get_mason_packages(ft)`. Installation is limited to mapped LSPs, formatters, linters and debug adapters for that filetype, plus auxiliary packages. Mason package names and runtime names may differ, for example:
 
 | Runtime name | Mason package name |
 | --- | --- |
@@ -247,19 +251,103 @@ The Mason registry callback at the `VeryLazy` stage calls `toolchain.get_mason_p
 
 Name mappings are located in `lua/toolchain/mason.lua`. Every LSP, formatter, or linter that Mason should install automatically needs an explicit entry in this mapping, even when its runtime name matches the Mason package name. Unmapped tools are still declared for use, but are not added to the automatic installation list unless listed in `extra_packages`.
 
-Debug adapters and general auxiliary tools remain maintained in `extra_packages` and are not removed because the current language is not open. When a Mason registry refresh fails or a package does not exist, Mason itself reports the installation failure; this does not prevent language specifications from loading.
+Debug adapter mappings are `delve -> delve`, `debugpy -> debugpy`, and `js-debug -> js-debug-adapter`. GDB has no Mason mapping. `require("toolchain").mason.extra_packages` is an empty list by default and can contain additional literal package names; those are included even for unknown filetypes. When a Mason registry refresh fails or a package does not exist, Mason itself reports the installation failure; this does not prevent language specifications from loading.
 
-LSPs are enabled by `FileType`: when a name mapping exists, the package must first be installed in Mason; without a mapping, `is_installed()` directly returns true, after which availability still depends on whether the command is executable. After installation succeeds, already-open buffers' services are retried. `dartls` has no Mason mapping and requires the Dart SDK; `rustfmt` is also unmapped and should be prepared separately. ESLint has no package name mapping, so CLI linting requires the project or PATH to provide it. `bacon-ls` has no name mapping but is included in the extra installation list. The zsh filetype shares the `bash-language-server` package mapping with bash.
+LSPs are enabled by `FileType`: when a name mapping exists, the package must first be installed in Mason; without a mapping, `is_installed()` directly returns true, after which availability still depends on whether the command is executable. After installation succeeds, already-open buffers' services are retried. `dartls` has no Mason mapping and requires the Dart SDK; `rustfmt` is also unmapped and should be prepared separately. ESLint has no package name mapping, so CLI linting requires the project or PATH to provide it. `bacon-ls` has an explicit Mason mapping. The zsh filetype shares the `bash-language-server` package mapping with bash.
 
 Language filetypes trigger the first `vim.lsp.enable(name)` call; the server is then enabled globally. Its own filetypes and root rules determine later attachments. For example, opening Go first enables gopls, which can then attach to `gomod`, `gowork`, and `gotmpl` buffers even though those types are not in the Go language specification.
 
 `lsp/emmylua.lua`, `lsp/nushell.lua`, and `lsp/stylua.lua` are not currently enabled by language specifications. Java declares `jdtls`, whose configuration is only `cmd = "jdtls"`; it has no project workspace or debugging integration.
+
+## Debugging
+
+Debug specs in `lua/toolchain/debug/specs/*.lua` define an adapter table or factory, configurations, and optional DAP `type` (defaults to spec filename). Language `debug` accepts adapter ID strings or `{ adapter, defaults = false, configurations }`; defaults append unless disabled, and explicit configs append/replace accordingly. C, C++, and Rust share GDB.
+
+`setup_debug(opts)` preserves native entries and is idempotent; `{ override = true }` overrides conflicts. `{ launch_json = false }` restores the previous provider, including the native current-working-directory provider. User-supplied providers are preserved by default. It reads nearest `.vscode/launch.json` per request, expands workspace variables, aliases node/python/go to pwa-node/debugpy/delve; it does not implement VS Code tasks/extensions or browser defaults. Toolchain prompts abort on empty/canceled input. Native launch.json inputs retain nvim-dap behavior: canceled prompts are not consistently converted to `dap.ABORT`. VS Code command variables, compounds, tasks and extension-specific launch fields are not implemented.
+
+GDB 14.1+ with Python/DAP support is required from the system, not Mason. GDB version validation and debugpy import validation are bounded by 3 seconds; missing or invalid adapters raise a clear error instead of leaving an asynchronous callback pending. Python chooses project `.venv`/`venv`, active `VIRTUAL_ENV`, then system Python. JS uses command wrappers or project `@vscode/js-debug`; TypeScript prompts for compiled JS. Vue supports attach only; start npm/pnpm inspector scripts manually. Cargo requires a built artifact and prompts for selection; there is no auto-build.
+
+Mason derives packages per filetype from language maps; `extra_packages` defaults to empty. Only `nvim-dap` and `nvim-dap-view` plugins are added; test/coverage is not implemented.
+
+The 12 mappings are `<leader>dc` continue/start, `dp` pause, `dr` restart, `dt` terminate, `db` breakpoint, `dB` conditional breakpoint, `di` step into, `do` step over, `dO` step out, `dg` run to cursor, `du` toggle UI, and `de` REPL.
+
+### Declarations and extension
+
+```lua
+-- lang/specs/go.lua
+return { filetypes = { "go" }, debug = { "delve" } }
+
+-- Append a language-specific configuration; use defaults = false to replace.
+return {
+    filetypes = { "c" },
+    debug = {
+        { adapter = "gdb", configurations = {
+            { name = "My binary", request = "launch", program = "/path/to/build/app" },
+        } },
+    },
+}
+```
+
+Adapter IDs and DAP types are distinct: the `js-debug` spec registers `pwa-node`. Each adapter is registered once; configurations are copied independently for each filetype. A language can list multiple adapters. Languages without `debug` do not receive automatic configurations.
+
+To add an adapter, create `debug/specs/<id>.lua` returning `adapter` (a native executable/server/pipe table or callback factory), `configurations` (a list), and optional `type`. Add its ID to language `debug` declarations and an explicit Mason mapping if installation is desired. No index update is needed. Add languages through `lang/specs/` as before, with an optional `debug` field.
+
+Formatter specs return `FormatSpec` with a `formatter` override; linter specs return `LintSpec` with a `linter` override. Their existing conditions and language associations are unchanged. Tools with suitable built-in Conform/nvim-lint behavior need no override spec.
+
+### Manual and mixed configuration
+
+```lua
+local dap = require("dap")
+dap.adapters.custom = { type = "executable", command = "custom-dap" }
+dap.configurations.c = {
+    { name = "Custom", type = "custom", request = "launch", program = "/path/to/app" },
+}
+require("toolchain").setup_debug() -- retains these and appends defaults
+-- vim.list_extend(dap.configurations.c, { another_config }) appends explicitly.
+-- Assign dap.configurations.c = {...} after setup to replace that filetype.
+-- require("toolchain").setup_debug({ override = true }) replaces declared defaults/conflicts.
+```
+
+Existing manual entries remain first; exact duplicate configurations are not appended. Distinct configurations sharing a display name remain distinct. Toolchain-owned configurations are refreshed on repeated setup; edit language declarations or add native entries to customize them persistently. User adapter/provider entries take priority unless `override = true` is explicit. `setup_debug` does not wrap DAP session operations.
+
+### Initial support and limits
+
+| Language | Adapter | Configurations |
+| --- | --- | --- |
+| C / C++ | GDB | Select executable, attach process |
+| Rust | GDB | Shared defaults plus Cargo artifact selection |
+| Go | Delve | Package, current file, package tests, local process attach |
+| Python | debugpy | Current file, module, attach to 127.0.0.1:5678 |
+| JavaScript / TypeScript, including React filetypes | vscode-js-debug | Node launch, Node Inspector attach, source maps |
+| Vue / Nuxt | vscode-js-debug | Node Inspector attach only |
+
+GDB is the common Linux default for C/C++/Rust; LLDB can offer better macOS integration and Rust visualizers but needs a separate adapter spec. Compile native artifacts with debug symbols. Cargo selection respects metadata target paths but does not build or automatically load Rust pretty printers. Go current-file debugging only works for self-contained files; package tests run the package rather than discovering individual tests. Attach depends on OS permissions and adapter capabilities.
+
+Node attach prompts for the Inspector port (default 9229). Start the server with an appropriate `node --inspect` command or npm/pnpm script first. Nearest `package.json` determines package cwd in a monorepo; specify project cwd/env/args/runtime in launch.json where needed. TypeScript requires emitted JavaScript and source maps or a manually configured runtime/loader. JSX is not transpiled automatically. Vue SFCs are never launched as Node files; browser debugging is not configured.
+
+The Python adapter process and target interpreter are separate: a Mason `debugpy-adapter` can debug a project's selected Python. Interpreter choice is `.venv`, `venv`, `VIRTUAL_ENV`, then PATH Python; override `pythonPath` for other environments. Local JS discovery accepts an existing built `node_modules/@vscode/js-debug/src/dapDebugServer.js`; it does not build source checkouts. Mason's exported wrapper is preferred over internal package paths.
+
+The launch.json provider reloads on every new selection, without mutating `dap.configurations`. It uses the nearest ancestor containing `.vscode` and leaves configuration selection to nvim-dap. Workspace variables resolve to that directory; other native DAP variables remain native. It does not infer adapter types from display names, execute preLaunchTask, or supply remote path mappings. Users must provide adapter-compatible fields, environment, arguments and compiled paths.
+
+Default Go launch configurations set `outputMode = "remote"` to forward stdout/stderr through DAP; add this field to custom Go launch.json entries to see output in REPL. Attach does not capture an existing process's output. The UI defaults to REPL so adapter output events are visible as they arrive; programs requesting a separate terminal use dap-view's terminal window. With focus in the debug window, press `R` for REPL output, `S` for scopes, or `W` for watches. UI opens/closes through dap-view's native `auto_toggle = true`, with its last-session close guard; manual toggle uses `<leader>du`. Listener keys are managed by the plugin and do not accumulate on setup.
 
 ## Verification
 
 ```sh
 stylua --check lua/toolchain lua/plugins/highlight/treesitter.lua lua/sources/language.lua
 git diff --check
+nvim --headless -u NONE -l tests/toolchain_regression.lua
+nvim --headless -u NONE -l tests/toolchain_debug.lua
+```
+
+A live Go/C session uses the actual harness environment, for example:
+
+```sh
+TOOLCHAIN_DEBUG_LANGUAGE=go \
+TOOLCHAIN_DEBUG_SOURCE=/path/to/main.go \
+TOOLCHAIN_DEBUG_PROGRAM=/path/to/go/package \
+TOOLCHAIN_DEBUG_LINE=5 \
+nvim --headless -u NONE -l tests/debug_session.lua
 ```
 
 Check specification loading and aggregation:
@@ -272,6 +360,10 @@ nvim --headless -u NONE \
 ```
 
 `<leader>cL` displays language names and filetypes; the preview displays the language specification source, and the default selection directly opens the corresponding `toolchain/lang/specs/<language-name>.lua` file.
+
+The regression test compares existing formatter/linter associations and package baseline, intentionally excluding the new debug packages. The actual Go Package, Current File, Package Tests, C GDB and Rust GDB sessions passed full breakpoint, continue, termination, and dap-view UI lifecycle checks. debugpy and js-debug-adapter were unavailable, so Python/JavaScript live sessions were not run and no packages were installed.
+
+For Rust, each Cargo launch invokes `cargo metadata --no-deps --format-version 1` with a 3-second timeout. Successful metadata supplies `workspace_root` and `target_directory`; otherwise the configuration falls back to the nearest Cargo root and `CARGO_TARGET_DIR` (or `<root>/target`). It selects an existing artifact and never builds it. The Go adapter starts Delve with the selected configuration's `cwd`.
 
 ## Relationship with Other Modules
 

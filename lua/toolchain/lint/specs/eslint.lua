@@ -9,7 +9,7 @@ local configs = {
 	"eslint.config.cjs",
 }
 
----@type ToolSpec
+---@type LintSpec
 return {
 	linter = {
 		condition = function(ctx)

@@ -1,7 +1,8 @@
 local M = {}
 
 M.lang = require("toolchain.lang")
-M.tool = require("toolchain.tool")
+M.format = require("toolchain.format")
+M.lint = require("toolchain.lint")
 M.mason = require("toolchain.mason")
 
 function M.setup()
@@ -13,7 +14,7 @@ function M.get_formatters()
 end
 
 function M.get_formatter_configs()
-	return M.tool.get_formatter_configs()
+	return M.format.get_formatter_configs()
 end
 
 function M.get_linters()
@@ -21,7 +22,11 @@ function M.get_linters()
 end
 
 function M.get_linter_configs()
-	return M.tool.get_linter_configs()
+	return M.lint.get_linter_configs()
+end
+
+function M.setup_debug(opts)
+	require("toolchain.debug").setup(opts)
 end
 
 function M.get_treesitter()

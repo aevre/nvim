@@ -43,7 +43,7 @@ nvim-lint 在 `BufReadPost`、`BufWritePost`、`InsertLeave` 上注册 100ms 防
 
 Treesitter 使用 `main` 分支，在 `BufReadPre`、`BufNewFile` 或 `VeryLazy` 加载。只有语言规格声明了 `treesitter` 的 filetype 才注册启动回调。先尝试启动已有 parser，失败时请求对应 parser 安装，每 100ms 重试，达到 300 次后报告失败。成功后设置 Treesitter 缩进和当前可见窗口的折叠表达式。独立的 CSS/HTML 文件未配置 Treesitter 自动启动；Vue 规格额外声明了 CSS/SCSS parser。
 
-Mason 的额外清单包含 codelldb、delve、Java/JS 调试适配器等，但当前没有对应的完整 DAP UI/调试配置。工具安装与编辑器功能启用是两件事。
+调试使用工具链中的 DAP 规格，仅增加 `nvim-dap` 和 `nvim-dap-view`；GDB 14.1+ 由系统提供，Delve、debugpy 和 JS 调试适配器按 filetype 选择 Mason 包。适配器行为、launch.json 支持、限制和测试见[工具链配置](toolchain.zh-CN.md#调试)。
 
 ## 需要自行准备的集成
 

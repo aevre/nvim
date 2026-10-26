@@ -1,6 +1,6 @@
 local configs = { ".oxlintrc.json" }
 
----@type ToolSpec
+---@type LintSpec
 return {
 	linter = {
 		condition = function(ctx)

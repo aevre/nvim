@@ -43,7 +43,7 @@ nvim-lint registers callbacks with a 100ms debounce on `BufReadPost`, `BufWriteP
 
 Treesitter uses the `main` branch and loads on `BufReadPre`, `BufNewFile`, or `VeryLazy`. Startup callbacks are registered only for filetypes whose language specs declare `treesitter`. It first attempts to start an existing parser; if that fails, it requests installation of the corresponding parser and retries every 100ms, reporting failure after 300 attempts. On success, it sets Treesitter indentation and the fold expression for currently visible windows. Standalone CSS and HTML files do not start Treesitter automatically. The Vue spec additionally declares CSS/SCSS parsers.
 
-Mason's extra package list includes codelldb, delve, Java/JS debug adapters, and others, but there is currently no corresponding complete DAP UI/debugging configuration. Installing a tool and enabling an editor feature are two separate things.
+Debugging uses the toolchain's DAP specs and adds only `nvim-dap` plus `nvim-dap-view`; GDB 14.1+ is provided by the system, while Delve, debugpy, and JS debug adapter packages are selected per filetype. See [Toolchain Configuration](toolchain.md#debugging) for adapter behavior, launch.json support, limitations, and tests.
 
 ## Integrations You Need to Prepare Yourself
 

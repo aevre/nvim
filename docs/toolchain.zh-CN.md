@@ -7,7 +7,7 @@
 `lua/toolchain` 是语言和开发工具配置的统一入口：
 
 - `toolchain/lang/specs/*.lua` 描述语言、filetype、LSP、Treesitter，以及该语言使用的 formatter/linter 名称。
-- `toolchain/tool/specs/*.lua` 描述工具自己的可用条件和 Conform 配置，例如项目中是否存在该工具的配置文件。
+- `toolchain/format/specs/*.lua` 与 `toolchain/lint/specs/*.lua` 描述工具条件（分别使用 `formatter` 和 `linter` 字段）。`toolchain/specs.lua` 自动发现语言、格式化、lint 和调试规格目录中的 `.lua` 文件。
 - `toolchain/mason.lua` 将 LSP、formatter、linter 名称映射为 Mason 包名，并保留调试和辅助工具。
 - `toolchain/init.lua` 聚合这些配置，供 LSP、Conform、nvim-lint、Mason、Treesitter 和 fzf source 使用。
 
@@ -22,34 +22,36 @@
 | `get_linter_configs()` | 返回工具规格提供的 nvim-lint linter 条件。 |
 | `get_treesitter()` | 返回语言规格声明的 parser 和用于启动 parser 的 filetype。 |
 | `get_language_by_filetype(ft)` | 合并声明该 filetype 的语言规格；不存在时返回 nil。 |
-| `get_mason_packages()` | 返回语言工具和额外工具对应的 Mason 包名。 |
+| `get_mason_packages(ft)` | 返回语言工具和额外工具对应的 Mason 包名。 |
 
 语言规格只描述语言与工具的关系；工具条件、LSP 启动参数和 UI 行为分别由
-对应的 `tool/specs/`、`lsp/` 和插件配置负责。
+对应的 `format/specs/` / `lint/specs/`、`lsp/` 和插件配置负责。
 
 ## 目录结构
 
 ```text
 lua/toolchain/
 ├── init.lua
+├── specs.lua
 ├── mason.lua
 ├── lang/
 │   ├── init.lua
-│   └── specs/
-│       ├── lua.lua
-│       ├── python.lua
-│       └── ...
-└── tool/
+│   └── specs/*.lua
+├── format/
+│   ├── init.lua
+│   └── specs/*.lua
+├── lint/
+│   ├── init.lua
+│   └── specs/*.lua
+└── debug/
     ├── init.lua
-    └── specs/
-        ├── prettier.lua
-        ├── biome.lua
-        └── oxfmt.lua
+    ├── context.lua
+    └── specs/*.lua
 ```
 
-语言和工具规格目录中的每个 `.lua` 文件都会被自动扫描。不要在这两个
+语言和工具规格目录中的每个 `.lua` 文件都会被自动扫描。不要在这些
 `specs/` 目录中放置模板 Lua 文件、测试文件或返回非规格内容的 Lua 文件，
-否则启动时会被当作配置加载并产生警告。工具链文档放在 `docs/`，
+无效规格会在加载时明确报出来源。工具链文档放在 `docs/`，
 模板应放在规格目录之外或 Markdown 文件中。
 
 ## 语言规格
@@ -118,7 +120,7 @@ local configs = {
 	"prettier.config.js",
 }
 
----@type ToolSpec
+---@type FormatSpec
 return {
 	formatter = {
 		condition = function(_, ctx)
@@ -146,9 +148,9 @@ return {
 这些条件位于：
 
 ```text
-lua/toolchain/tool/specs/prettier.lua
-lua/toolchain/tool/specs/biome.lua
-lua/toolchain/tool/specs/oxfmt.lua
+lua/toolchain/format/specs/prettier.lua
+lua/toolchain/format/specs/biome.lua
+lua/toolchain/format/specs/oxfmt.lua
 ```
 
 配置探测从当前文件目录向上搜索，以 home 目录为停止边界，只识别各工具规格中
@@ -170,8 +172,8 @@ Linter 也遵循相同规则。语言规格中的 `linters` 只声明语言使�
 这些条件位于：
 
 ```text
-lua/toolchain/tool/specs/eslint.lua
-lua/toolchain/tool/specs/oxlint.lua
+lua/toolchain/lint/specs/eslint.lua
+lua/toolchain/lint/specs/oxlint.lua
 ```
 
 修改 linter 配置文件探测规则时，只修改对应工具规格，不要把条件逻辑写回
@@ -255,7 +257,7 @@ lint_filetypes = { "typescript" },
 2. 新建 `lua/toolchain/lang/specs/zig.lua`，至少填写 `filetypes`。
 3. 按需补充 `formatters`、`linters`、`lsp` 和 `treesitter`。
 4. 如果 LSP 名称没有对应的 `lsp/<名称>.lua`，新建该文件。
-5. 如果工具需要配置文件条件，在 `toolchain/tool/specs/` 中新增或修改对应工具规格。
+5. 如果工具需要配置文件条件，在 `toolchain/format/specs/` 或 `toolchain/lint/specs/` 中新增或修改对应规格。
 6. 需要 Mason 自动安装的工具，在 `lua/toolchain/mason.lua` 中添加显式名称映射，即使运行时名称与包名相同也要登记。
 7. 打开该语言文件，确认 LSP、格式化、lint 和 Treesitter 行为。
 
@@ -266,7 +268,7 @@ lint_filetypes = { "typescript" },
 
 - 改变语言与 filetype 的关系：修改 `toolchain/lang/specs/*.lua` 的 `filetypes`。
 - 改变语言使用哪些工具：修改语言规格的 `formatters` 或 `linters`。
-- 改变工具是否可用：修改 `toolchain/tool/specs/<tool>.lua` 的条件。
+- 改变 formatter 或 linter 是否可用：修改 `toolchain/format/specs/<tool>.lua` 或 `toolchain/lint/specs/<tool>.lua` 中的 `formatter` 或 `linter` 字段。
 - 改变 LSP 命令、root 或 settings：修改 `lsp/<名称>.lua`。
 - 改变 Treesitter parser/filetype：修改语言规格的 `treesitter` / `filetypes`。
 - 改变 Treesitter 启动、安装与重试机制：修改 `lua/plugins/highlight/treesitter.lua`。
@@ -276,9 +278,7 @@ lint_filetypes = { "typescript" },
 
 ## Mason 自动安装
 
-`VeryLazy` 阶段的 Mason registry 回调会调用 `toolchain.get_mason_packages()`，
-根据当前语言规格中实际声明且有名称映射的 LSP、formatter 和 linter 安装对应包。
-这不是仅针对当前已打开语言的安装列表。Mason 包名与运行时
+`VeryLazy` 阶段刷新 Mason registry 后，会处理已打开的 buffer，并监听后续 `FileType`。调用 `toolchain.get_mason_packages(ft)`，仅安装该 filetype 声明且有映射的 LSP、formatter、linter、debug adapter，以及额外工具。Mason 包名与运行时
 名称可能不同，例如：
 
 | 运行时名称 | Mason 包名 |
@@ -292,15 +292,14 @@ lint_filetypes = { "typescript" },
 或 linter 都必须显式登记，即使运行时名称与 Mason 包名相同。未映射的工具仍会
 被配置声明使用，但除非列入 `extra_packages`，否则不会进入自动安装清单。
 
-调试适配器和通用辅助工具仍在 `extra_packages` 中维护，不会因为当前语言
-没有打开而被移除。Mason 注册表刷新失败或包不存在时，安装动作由 Mason
+Debug 映射为 `delve -> delve`、`debugpy -> debugpy`、`js-debug -> js-debug-adapter`；GDB 无 Mason 映射。`require("toolchain").mason.extra_packages` 默认为空，可加入额外包名，未知 filetype 也会包含这些额外包。Mason 注册表刷新失败或包不存在时，安装动作由 Mason
 自身报告失败，不会阻止语言规格加载。
 
 LSP 则按 `FileType` 启用：有名称映射时，必须先在 Mason 中安装；无映射时
 `is_installed()` 直接返回 true，后续仍取决于命令是否可执行。安装成功后会
 重试已打开 buffer 的服务。`dartls` 无 Mason 映射，需要 Dart SDK；`rustfmt`
 也未映射，应自行准备。ESLint 没有包名映射，CLI lint 需要项目或 PATH 提供。
-`bacon-ls` 没有名称映射，但已列入额外安装清单。zsh filetype 与 bash 共用
+`bacon-ls` 已有显式 Mason 映射。zsh filetype 与 bash 共用
 `bash-language-server` 的 Mason 包映射。
 
 语言规格的 filetype 触发首次 `vim.lsp.enable(name)`，随后该服务全局启用，
@@ -311,11 +310,90 @@ gopls 后，它还可附着到 `gomod`、`gowork`、`gotmpl` buffer，尽管 Go 
 `lsp/emmylua.lua`、`lsp/nushell.lua`、`lsp/stylua.lua` 当前没有被语言规格启用。
 Java 声明了 `jdtls`，其配置仅为 `cmd = "jdtls"`，没有项目 workspace 或调试集成。
 
+## 调试
+
+`lua/toolchain/debug/specs/*.lua` 中的 `DebugSpec` 定义 adapter 表或 factory、configurations 和可选 DAP `type`（默认取规格文件名）。语言规格的 `debug` 可写 adapter ID 字符串，或 `{ adapter, defaults = false, configurations }`；默认配置会包含，显式配置追加，`defaults = false` 时仅使用显式配置。C、C++、Rust 共用 GDB。
+
+`setup_debug(opts)` 保留原生配置并保证重复调用幂等；`{ override = true }` 覆盖冲突，`{ launch_json = false }` 恢复先前 provider，包括原生基于当前目录的 provider。默认保留用户自定义 provider。provider 按需读取最近的 `.vscode/launch.json`，展开 workspace 变量，并将 node/python/go 别名映射为 pwa-node/debugpy/delve；不支持 VS Code tasks/extensions 或浏览器默认配置。Toolchain 自带输入取消或留空会中止；原生 launch.json 输入沿用 nvim-dap 行为，取消未必转换成 `dap.ABORT`。不实现 VS Code command 变量、compound、task 和扩展专属字段。
+
+GDB 需系统提供 14.1+ 且带 Python/DAP 支持，不通过 Mason 安装。GDB 版本校验和 debugpy 导入校验均限制为 3 秒；缺少或无效的 adapter 会立即报告清晰错误，不会让异步 callback 一直挂起。Python 依次选择项目 `.venv`、`venv`、活动 `VIRTUAL_ENV`、系统 Python。JS 使用命令包装器或项目的 `@vscode/js-debug`；TypeScript 提示选择编译后的 JS。Vue 仅支持 attach；需手动启动 npm/pnpm inspector 脚本。Cargo 要求已有编译产物并提示选择，不会自动构建。
+
+Mason 按 filetype 从语言规格映射包；`extra_packages` 默认空。仅添加 `nvim-dap`、`nvim-dap-view` 插件，未实现 test/coverage。12 个快捷键为：`<leader>dc` 继续/启动、`dp` 暂停、`dr` 重启、`dt` 终止、`db` 断点、`dB` 条件断点、`di` 步入、`do` 步过、`dO` 步出、`dg` 运行到光标、`du` 切换 UI、`de` REPL。
+
+### 声明与扩展
+
+```lua
+-- 使用共享默认配置
+return { filetypes = { "go" }, debug = { "delve" } }
+
+-- 追加语言配置；defaults = false 表示只使用显式配置
+return {
+    filetypes = { "c" },
+    debug = {
+        { adapter = "gdb", configurations = {
+            { name = "My binary", request = "launch", program = "/path/to/build/app" },
+        } },
+    },
+}
+```
+
+一个语言可以声明多个 Adapter；同一 Adapter 只注册一次，各 filetype 的 Configuration 独立复制。未声明 `debug` 的语言不会自动获得配置。`js-debug` 是规格 ID，注册的 DAP type 是 `pwa-node`。
+
+新增 Adapter：在 `debug/specs/<id>.lua` 返回 `adapter`（原生 executable/server/pipe 表或 callback factory）、`configurations` 列表和可选 `type`；在语言 `debug` 中引用，需要自动安装时添加 Mason 映射。无需手动索引。新增语言仍只需添加 `lang/specs/` 文件，并按需填写 `debug`。
+
+Formatter Spec 使用 `FormatSpec.formatter`；Linter Spec 使用 `LintSpec.linter`。保留原有条件和关联，使用内置默认配置的工具不必创建额外 Spec。
+
+### 手动配置与混合配置
+
+```lua
+local dap = require("dap")
+dap.adapters.custom = { type = "executable", command = "custom-dap" }
+dap.configurations.c = {
+    { name = "Custom", type = "custom", request = "launch", program = "/path/to/app" },
+}
+require("toolchain").setup_debug()
+```
+
+手动条目保留在前，默认配置追加，完全相同的配置不重复。显示名称相同不会触发覆盖。使用 `vim.list_extend(dap.configurations.c, {...})` 显式追加；在初始化后直接赋值 `dap.configurations.c = {...}` 可替换该 filetype。`setup_debug({ override = true })` 则明确替换声明范围内的配置和 Adapter。重复初始化会刷新 Toolchain 管理的条目；持久自定义应修改语言声明或新增原生条目。已有用户 Adapter 和 Provider 默认优先。
+
+### 初始支持与限制
+
+| 语言 | Adapter | 默认能力 |
+| --- | --- | --- |
+| C / C++ | GDB | 选择可执行文件、Attach 进程 |
+| Rust | GDB | 共享默认配置，加 Cargo 构建产物选择 |
+| Go | Delve | Package、Current File、Package Tests、Attach 本地进程 |
+| Python | debugpy | File、Module、Attach 127.0.0.1:5678 |
+| JS / TS（含 React filetype） | vscode-js-debug | Node Launch、Inspector Attach、Source Maps |
+| Vue / Nuxt | vscode-js-debug | 仅 Node Inspector Attach |
+
+GDB 便于 Linux 上共享 C/C++/Rust；LLDB 在 macOS 集成和 Rust 可视化上可能更适合，可另加 Spec。请为构建产物启用 Debug Symbols；当前不会自动构建或加载 Rust pretty printer。Go Current File 仅适合自包含文件，Package Tests 调试整个包，不发现单个测试；Attach 仍受系统权限和调试器能力限制。
+
+Node Attach 默认端口 9229，需先自行通过 `node --inspect` 或 npm/pnpm 脚本启动服务。Monorepo 使用最近的 `package.json` 作为 cwd，特殊工作目录、环境变量、参数和 Runtime 可写入 launch.json。TS 默认选择编译后的 JS 并依赖 Source Maps；不自动转译 JSX，也不直接运行 Vue SFC。未配置浏览器调试。
+
+Python Adapter 与目标解释器独立：Mason Adapter 可以调试项目 `.venv`。其他解释器可通过原生 `pythonPath` 指定。本地 JS Adapter 仅使用已有构建入口 `node_modules/@vscode/js-debug/src/dapDebugServer.js`，不构建源码；优先使用 Mason 导出的命令包装器。
+
+launch.json 每次选择时重新读取，不累计写入 `dap.configurations`。使用最近包含 `.vscode` 的祖先目录，workspace 变量展开到该目录，其余变量沿用 nvim-dap。不执行 preLaunchTask、不推测远程路径映射、不实现完整 VS Code 系统。请填写 Adapter 实际支持的字段。
+
+Go 的默认 Launch 配置使用 `outputMode = "remote"`，通过 DAP 转发 stdout/stderr；自定义 Go launch.json 也应添加此字段才能在 REPL 查看输出。Attach 不会接管已有进程的输出。UI 默认显示 REPL 标签，实时显示 Adapter 发来的程序输出；需要独立终端的程序由 dap-view 显示终端。将焦点移入调试窗口后，按 `R` 查看 REPL 输出、按 `S` 查看变量、按 `W` 查看 Watches。UI 使用 dap-view 原生 `auto_toggle = true` 管理，最后一个会话结束时关闭，可用 `<leader>du` 手动切换。监听器使用插件自身固定键，不随初始化累积。
+
 ## 验证
 
 ```sh
 stylua --check lua/toolchain lua/plugins/highlight/treesitter.lua lua/sources/language.lua
 git diff --check
+nvim --headless -u NONE -l tests/toolchain_regression.lua
+nvim --headless -u NONE -l tests/toolchain_debug.lua
+```
+
+实时 Go/C 会话使用实际 harness 环境，例如：
+
+```sh
+TOOLCHAIN_DEBUG_LANGUAGE=go \
+TOOLCHAIN_DEBUG_SOURCE=/path/to/main.go \
+TOOLCHAIN_DEBUG_PROGRAM=/path/to/go/package \
+TOOLCHAIN_DEBUG_LINE=5 \
+nvim --headless -u NONE -l tests/debug_session.lua
 ```
 
 检查规格加载和聚合：
@@ -329,6 +407,10 @@ nvim --headless -u NONE \
 
 `<leader>cL` 显示语言名和 filetype，预览显示语言规格源码，默认选择直接
 打开对应的 `toolchain/lang/specs/<语言名>.lua` 文件。
+
+回归测试会比较既有 formatter/linter 关联和包基线，并刻意排除新增 debug 包。实际 Go Package、Current File、Package Tests、C GDB 与 Rust GDB 会话已通过完整的断点、继续、终止和 dap-view UI 生命周期检查。由于未安装 debugpy/js-debug-adapter，未运行 Python/JavaScript 真实会话，也没有执行安装。
+
+Rust 每次 Cargo 启动都会以 3 秒超时调用 `cargo metadata --no-deps --format-version 1`。元数据成功时使用 `workspace_root` 和 `target_directory`；否则回退到最近的 Cargo 根目录和 `CARGO_TARGET_DIR`（或 `<root>/target`）。它只选择已有产物，不会自动构建。Go adapter 会使用所选配置的 `cwd` 启动 Delve。
 
 ## 与其他模块的关系
 
