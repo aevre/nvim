@@ -11,9 +11,10 @@ return {
 		},
 		-- version = "1.*",
 		build = function()
-			require("blink.cmp").build():wait(60000)
+			require("blink.cmp").build():pwait()
 		end,
 
+		---@module 'blink.cmp'
 		---@type blink.cmp.Config
 		opts = {
 			appearance = { nerd_font_variant = "mono" },
@@ -29,6 +30,7 @@ return {
 					scrollbar = false,
 					border = "rounded",
 					draw = {
+						padding = 0,
 						treesitter = { "lsp" },
 						columns = {
 							{ "kind_icon" },
@@ -97,6 +99,7 @@ return {
 				end,
 				frecency = {
 					enabled = true,
+					path = vim.fn.stdpath("state") .. "/blink/cmp/frecency.dat",
 				},
 				use_proximity = true,
 				sorts = {

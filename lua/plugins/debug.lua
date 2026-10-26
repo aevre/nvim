@@ -5,10 +5,22 @@ return {
 	dependencies = {
 		{
 			"igorlfs/nvim-dap-view",
-			opts = { auto_toggle = true, winbar = { default_section = "repl" } },
+			opts = {
+				auto_toggle = true,
+				winbar = {
+					default_section = "repl",
+					controls = {
+						enabled = true,
+					},
+				},
+				virtual_text = {
+					enabled = true,
+				},
+			},
 		},
 	},
 	config = function()
+		vim.fn.sign_define("DapBreakpoint", { text = "●", texthl = "DiagnosticSignError", linehl = "", numhl = "" })
 		require("toolchain").setup_debug()
 	end,
 	keys = {
@@ -98,6 +110,13 @@ return {
 				require("dap").repl.toggle()
 			end,
 			desc = "Debug REPL",
+		},
+		{
+			"<leader>dh",
+			function()
+				require("dap-view").hover()
+			end,
+			desc = "Debug Hover",
 		},
 	},
 }
