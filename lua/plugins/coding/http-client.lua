@@ -11,6 +11,29 @@ return {
 			default_env_file = "http-client.env.json",
 		})
 
+		-- Preserve repeated Set-Cookie headers before the plugin flattens them.
+		local response_handler = require("http_client.core.response_handler")
+		local execute_response_handler = response_handler.execute
+		response_handler.execute = function(script, response)
+			local headers, cookies = {}, {}
+			for key, value in pairs(response.headers or {}) do
+				local name, cookie
+				if type(key) == "number" and type(value) == "string" then
+					name, cookie = value:match("^([^:]+):%s*(.*)")
+				end
+				if name and name:lower() == "set-cookie" then
+					cookies[#cookies + 1] = cookie
+				else
+					headers[key] = value
+				end
+			end
+			if #cookies > 0 then
+				headers["set-cookie"] = table.concat(cookies, "\n")
+			end
+			local adapted = vim.tbl_extend("force", {}, response, { headers = headers })
+			return execute_response_handler(script, adapted)
+		end
+
 		local function load_buffer_env(buf)
 			local path = vim.api.nvim_buf_get_name(buf)
 			if path == "" then

@@ -25,6 +25,7 @@ return {
 		icons = {},
 		lsp_progress = true,
 		debug = vim.env.NVIM_PLUGIN_MODE == "dev",
+		merge_duplicates = 500,
 		routes = {
 			{
 				match = {

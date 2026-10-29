@@ -11,6 +11,7 @@ return {
 		},
 
 		linters_by_ft = require("toolchain").get_linters(),
+		linter_events = require("toolchain.lint").get_events(),
 
 		---@type table<string, LintLinter>
 		linters = require("toolchain").get_linter_configs(),
@@ -92,20 +93,23 @@ return {
 		end
 
 		local group = vim.api.nvim_create_augroup("nvim-lint", { clear = true })
+		local lint = M.debounce(100, M.lint)
 		vim.api.nvim_create_autocmd(opts.events, {
 			group = group,
-			callback = M.debounce(100, M.lint),
+			callback = lint,
 		})
-		vim.api.nvim_create_autocmd("User", {
-			group = group,
-			pattern = "ToolchainReady",
-			callback = function()
-				for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-					if vim.api.nvim_buf_is_loaded(bufnr) then
-						vim.api.nvim_buf_call(bufnr, M.lint)
+		for event, names in pairs(opts.linter_events) do
+			vim.api.nvim_create_autocmd(event, {
+				group = group,
+				callback = function()
+					local configured = lint._resolve_linter_by_ft(vim.bo.filetype)
+					for _, name in ipairs(configured) do
+						if vim.tbl_contains(names, name) then
+							lint.try_lint(name)
+						end
 					end
-				end
-			end,
-		})
+				end,
+			})
+		end
 	end,
 }

@@ -5,6 +5,7 @@
 ---@field lint_filetypes? string[] Optional subset of `filetypes` where linting runs.
 ---@field lsp? string[] Neovim LSP configuration names.
 ---@field treesitter? string[] Treesitter parser names.
+---@field treesitter_filetypes? string[] Filetypes used only to start Treesitter.
 ---@field debug? (string|LanguageDebug)[] Debug adapter declarations.
 
 ---@class ToolchainTreesitter
@@ -25,7 +26,15 @@ local specs_dir = vim.fs.joinpath(vim.fn.stdpath("config"), "lua", "toolchain", 
 
 ---@type table<string, LanguageSpec>
 local languages = require("toolchain.specs").load("lang", function(spec)
-	for _, field in ipairs({ "filetypes", "formatters", "linters", "lint_filetypes", "lsp", "treesitter" }) do
+	for _, field in ipairs({
+		"filetypes",
+		"formatters",
+		"linters",
+		"lint_filetypes",
+		"lsp",
+		"treesitter",
+		"treesitter_filetypes",
+	}) do
 		if spec[field] ~= nil then
 			if not vim.islist(spec[field]) or (field == "filetypes" and #spec[field] == 0) then
 				return false
@@ -131,6 +140,9 @@ function M.get_treesitter()
 		each_filetype(definition, function(filetype)
 			add_unique(result.filetypes, filetype)
 		end)
+		for _, filetype in ipairs(definition.treesitter_filetypes or {}) do
+			add_unique(result.filetypes, filetype)
+		end
 		::continue::
 	end
 	return result

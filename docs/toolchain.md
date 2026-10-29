@@ -78,6 +78,7 @@ Supported fields:
 | `lsp` | `string[]` | The LSP names to enable on demand when opening the corresponding filetype. |
 | `debug` | `(string|LanguageDebug)[]` | Adapter IDs or explicit language configurations. |
 | `treesitter` | `string[]` | The Treesitter parser names to install and enable. |
+| `treesitter_filetypes` | `string[]` | Additional filetypes that start those parsers without inheriting the language's other tools. |
 
 Use the array form even when there is only one value, such as `{ "stylua" }`. When multiple language specifications declare the same filetype, formatter, linter, LSP, and Treesitter aggregate queries deduplicate the results.
 
@@ -198,7 +199,7 @@ The table below lists the Conform formatter, CLI linter, and LSP declarations in
 | xml / xml, svg | xmlformatter | — | — |
 | yaml / yaml | Web combination | — | — |
 
-Parser declarations are bash, zsh, c, cpp, go, java, javascript, json, kotlin, lua, markdown/markdown_inline, nix, python, rust, toml, typescript/tsx, vue/css/scss, xml, and yaml. The CSS, Dart, HTML, Luau, Nu, QML, and SQL specifications have no `treesitter` field.
+Parser declarations are bash, zsh, c, cpp, go, gomod, gowork, gotmpl, java, javascript, json, kotlin, lua, markdown/markdown_inline, nix, python, rust, toml, typescript/tsx, vue/css/scss, xml, and yaml. The `gosum` filetype triggers the Go-related parsers; there is no separate `gosum` parser. The CSS, Dart, HTML, Luau, Nu, QML, and SQL specifications have no `treesitter` field.
 
 ## Lint Rules
 

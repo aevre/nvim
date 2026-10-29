@@ -7,6 +7,7 @@
 
 ---@class LintSpec
 ---@field linter LintLinter Fields merged into nvim-lint's built-in linter definition.
+---@field events? string[] Autocmd events that trigger this linter.
 
 local M = {}
 ---@type table<string, LintSpec>
@@ -20,6 +21,17 @@ function M.get_linter_configs()
 	local result = {}
 	for name, spec in pairs(specs) do
 		result[name] = vim.deepcopy(spec.linter)
+	end
+	return result
+end
+
+function M.get_events()
+	local result = {}
+	for name, spec in pairs(specs) do
+		for _, event in ipairs(spec.events or {}) do
+			result[event] = result[event] or {}
+			result[event][#result[event] + 1] = name
+		end
 	end
 	return result
 end

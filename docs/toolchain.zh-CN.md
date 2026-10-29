@@ -82,6 +82,7 @@ return {
 | `lint_filetypes` | `string[]` | 实际运行 lint 的 filetype；省略时使用 `filetypes`。 |
 | `lsp` | `string[]` | 打开对应 filetype 时按需启用的 LSP 名称。 |
 | `treesitter` | `string[]` | 要安装和启用的 Treesitter parser 名称。 |
+| `treesitter_filetypes` | `string[]` | 额外触发这些 parser、但不继承语言其他工具的 filetype。 |
 
 即使只有一个值也使用数组形式，例如 `{ "stylua" }`。同一 filetype 被多个
 语言规格声明时，formatter、linter、LSP 和 Treesitter 聚合查询会去重。
@@ -232,9 +233,10 @@ Web 格式化组合指 `prettier → biome → oxfmt`。
 | xml / xml, svg | xmlformatter | — | — |
 | yaml / yaml | Web 组合 | — | — |
 
-Parser 声明为 bash、zsh、c、cpp、go、java、javascript、json、kotlin、lua、
-markdown/markdown_inline、nix、python、rust、toml、typescript/tsx、vue/css/scss、
-xml、yaml。CSS、Dart、HTML、Luau、Nu、QML、SQL 规格没有 `treesitter` 字段。
+Parser 声明为 bash、zsh、c、cpp、go、gomod、gowork、gotmpl、java、javascript、
+json、kotlin、lua、markdown/markdown_inline、nix、python、rust、toml、typescript/tsx、
+vue/css/scss、xml、yaml。`gosum` filetype 会触发 Go 相关 parser 安装；没有独立的
+`gosum` parser。CSS、Dart、HTML、Luau、Nu、QML、SQL 规格没有 `treesitter` 字段。
 
 ## Lint 规则
 
