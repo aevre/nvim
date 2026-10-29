@@ -2,14 +2,14 @@ local parse = require("luasnip").parser.parse_snippet
 
 return {
 	parse(
-		{ trig = "jrecord", desc = "Public record (Java 16+)" },
+		{ trig = "record", desc = "Public record (Java 16+)" },
 		[[
 public record ${1:User}(${2:String name}) {
 	$0
 }]]
 	),
 	parse(
-		{ trig = "jswitch", desc = "Switch expression (Java 14+)" },
+		{ trig = "switch", desc = "Switch expression (Java 14+)" },
 		[[
 ${1:String} ${2:result} = switch (${3:value}) {
 	case ${4:0} -> ${5:"zero"};
@@ -18,13 +18,13 @@ ${1:String} ${2:result} = switch (${3:value}) {
 $0]]
 	),
 	parse(
-		{ trig = "joptional", desc = "Unwrap Optional or throw" },
+		{ trig = "optional", desc = "Unwrap Optional or throw" },
 		[[
 ${1:User} ${2:user} = ${3:optional}.orElseThrow(() -> new ${4:IllegalArgumentException}("${5:Not found}"));
 $0]]
 	),
 	parse(
-		{ trig = "jtest", desc = "JUnit 5 test method (Test import required)" },
+		{ trig = "test", desc = "JUnit 5 test method (Test import required)" },
 		[[
 @Test
 void ${1:shouldWork}() {
@@ -32,7 +32,7 @@ void ${1:shouldWork}() {
 }]]
 	),
 	parse(
-		{ trig = "jparamtest", desc = "JUnit 5 CSV parameterized test (ParameterizedTest, CsvSource imports required)" },
+		{ trig = "ptest", desc = "JUnit 5 CSV parameterized test (ParameterizedTest, CsvSource imports required)" },
 		[[
 @ParameterizedTest
 @CsvSource({
