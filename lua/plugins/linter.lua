@@ -93,10 +93,10 @@ return {
 		end
 
 		local group = vim.api.nvim_create_augroup("nvim-lint", { clear = true })
-		local lint = M.debounce(100, M.lint)
+		local debounced_lint = M.debounce(100, M.lint)
 		vim.api.nvim_create_autocmd(opts.events, {
 			group = group,
-			callback = lint,
+			callback = debounced_lint,
 		})
 		for event, names in pairs(opts.linter_events) do
 			vim.api.nvim_create_autocmd(event, {
