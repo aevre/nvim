@@ -139,6 +139,10 @@ Source: [lsp.lua](../lua/config/lsp.lua), [diagnostic.lua](../lua/config/keymaps
 | `<leader>qs` / `<leader>qS` | `n` | Restore / select a session |
 | `<leader>ql` | `n` | Restore the most recent session |
 | `<leader>qw` | `n` | Save the current session (`SessionSave`) |
+| `<leader>qd` | `n` | Select and delete a session |
+| `<leader>qD` | `n` | Delete the active session |
+| `<leader>qr` | `n` | Rename the active session |
+| `<leader>qR` | `n` | Select a session to rename |
 | `<leader>v` | `n,x` | Yank history |
 | `[y` / `]y` | `n` | Cycle through yank history |
 | `y`, `p`, `P`, `gp`, `gP` | `n,x` | Yanky copy and paste |

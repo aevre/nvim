@@ -36,5 +36,44 @@ return {
 			"<cmd>SessionSave<cr>",
 			desc = "Save Session",
 		},
+		{
+			"<leader>qd",
+			function()
+				require("session").delete_select()
+			end,
+			desc = "Delete Session",
+		},
+		{
+			"<leader>qD",
+			"<cmd>SessionDelete<cr>",
+			desc = "Delete Current Session",
+		},
+		{
+			"<leader>qr",
+			function()
+				local session = require("session")
+				local active = session.active()
+				if not active then
+					vim.notify("No active session", vim.log.levels.WARN)
+					return
+				end
+				vim.ui.input({ prompt = "New session name: ", default = active.name }, function(name)
+					if name and name ~= "" then
+						local path, err = session.rename(name)
+						if not path then
+							vim.notify("session.nvim: " .. tostring(err), vim.log.levels.ERROR)
+						end
+					end
+				end)
+			end,
+			desc = "Rename Current Session",
+		},
+		{
+			"<leader>qR",
+			function()
+				require("session").rename_select()
+			end,
+			desc = "Select Session to Rename",
+		},
 	},
 }

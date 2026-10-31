@@ -139,6 +139,10 @@
 | `<leader>qs` / `<leader>qS` | `n` | 恢复 / 选择会话 |
 | `<leader>ql` | `n` | 恢复最近会话 |
 | `<leader>qw` | `n` | 保存当前会话（`SessionSave`） |
+| `<leader>qd` | `n` | 选择并删除会话 |
+| `<leader>qD` | `n` | 删除当前活动会话 |
+| `<leader>qr` | `n` | 重命名当前活动会话 |
+| `<leader>qR` | `n` | 选择会话并重命名 |
 | `<leader>v` | `n,x` | Yank 历史 |
 | `[y` / `]y` | `n` | 循环 Yank 历史 |
 | `y`、`p`、`P`、`gp`、`gP` | `n,x` | Yanky 复制与粘贴 |
