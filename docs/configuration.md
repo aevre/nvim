@@ -72,7 +72,7 @@ The current model for Minuet and llm.nvim is `cohere/north-mini-code:free`; its 
 
 Autocommands set `*.env` / `.env.*` to `sh`, `*.ejs` / `*.ejs.t` to `embedded_template`, and `*.code-snippets` to `json`. JSON/JSONC do not conceal text. Several special windows register `q` to close them and are hidden from the buffer list. On `FileType`, `c/r/o` are removed from `formatoptions`, disabling automatic comment formatting and continuation.
 
-The theme gets its base colors from `lua/theme/palette.lua` and merges in `palette.json`; the default `variant = "auto"` follows `background`. Transparency is determined by the marker file `stdpath('data')/transparent`; `setup()` uses this file to override the supplied transparent value. `:TransparentToggle` changes the marker and reapplies the theme. Platforms that support signals also register SIGUSR1 to reapply the theme.
+The theme gets its base colors from `lua/theme/palette.lua` and merges in `palette.json`; the default `variant = "auto"` follows `background`. Transparency has one persisted state in `stdpath('data')/transparent`: terminals remove theme background highlights, while Neovide keeps the theme background and switches between the configured `g.neovide_opacity` and `1.0`. `:TransparentToggle` updates the same state from either frontend, and SIGUSR1 reloads and applies it.
 
 ## Troubleshooting
 

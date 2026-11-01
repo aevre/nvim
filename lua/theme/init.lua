@@ -77,6 +77,8 @@ function M.get_palette()
 	return load_palette()
 end
 
+local neovide_transparent_opacity = tonumber(vim.g.neovide_opacity) or 1
+
 local function transparent_path()
 	return vim.fn.stdpath("data") .. "/transparent"
 end
@@ -84,28 +86,33 @@ end
 local function is_transparent()
 	return vim.uv.fs_stat(transparent_path()) ~= nil
 end
+
+local function sync_transparent()
+	local transparent = is_transparent()
+	M.opts.transparent = transparent and not vim.g.neovide
+	if vim.g.neovide then
+		vim.g.neovide_opacity = transparent and neovide_transparent_opacity or 1
+	end
+	M.apply()
+end
+
 function M.setup(options)
 	M.opts = vim.tbl_deep_extend("force", M.opts, options or {})
-	M.opts.transparent = is_transparent()
-
-	M.apply()
+	sync_transparent()
 end
 
 function M.toggle_transparent()
 	local path = transparent_path()
-
-	M.opts.transparent = not M.opts.transparent
-
-	if M.opts.transparent then
+	if is_transparent() then
+		os.remove(path)
+	else
 		local file = io.open(path, "w")
 		if file then
 			file:close()
 		end
-	else
-		os.remove(path)
 	end
 
-	M.apply()
+	sync_transparent()
 end
 
 function M.apply()

@@ -6,11 +6,11 @@ vim.g.maplocalleader = " "
 _G.Utils = require("utils")
 _G.Config = {}
 
+require("config.options")
+
 -- local colorschemes = "tokyonight"
 
-require("theme").setup({ transparent = not vim.g.neovide, json = true })
-
-require("config.options")
+require("theme").setup({ json = true })
 require("config.filetype")
 require("config.autocmds")
 require("config.keymaps")
@@ -25,7 +25,7 @@ if signal then
 	signal:start(
 		"sigusr1",
 		vim.schedule_wrap(function()
-			require("theme").apply()
+			require("theme").setup()
 		end)
 	)
 end

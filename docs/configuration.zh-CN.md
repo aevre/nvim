@@ -72,7 +72,7 @@ Minuet 和 llm.nvim 当前模型为 `cohere/north-mini-code:free`；模型是否
 
 自动命令将 `*.env` / `.env.*` 设为 `sh`，`*.ejs` / `*.ejs.t` 设为 `embedded_template`，`*.code-snippets` 设为 `json`。JSON/JSONC 不隐藏文本；多个特殊窗口注册 `q` 关闭并从 buffer 列表隐藏。`FileType` 时移除 `formatoptions` 的 `c/r/o`，关闭注释自动排版和续写。
 
-主题从 `lua/theme/palette.lua` 取得基础颜色，并合并 `palette.json`；默认 `variant = "auto"` 跟随 `background`。透明状态由 `stdpath('data')/transparent` 标记文件决定，`setup()` 会用该文件覆盖传入的 transparent 值。`:TransparentToggle` 修改标记并重新应用主题；支持信号的平台还注册了 SIGUSR1 重新应用主题。
+主题从 `lua/theme/palette.lua` 取得基础颜色，并合并 `palette.json`；默认 `variant = "auto"` 跟随 `background`。透明状态统一由 `stdpath('data')/transparent` 标记文件持久化：终端通过主题高亮移除背景色，Neovide 保留主题背景色并在配置的 `g.neovide_opacity` 与 `1.0` 之间切换。`:TransparentToggle` 无论在哪个前端执行都会更新同一状态；SIGUSR1 会重新读取该状态并应用。
 
 ## 排错
 
