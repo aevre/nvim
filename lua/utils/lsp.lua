@@ -93,13 +93,15 @@ M.hover = function(config)
 			end
 
 			if result.range then
-				local start = result.range.start
-				local end_ = result.range["end"]
-				local start_idx = vim.lsp.util._get_line_byte_from_position(bufnr, start, client.offset_encoding)
-				local end_idx = vim.lsp.util._get_line_byte_from_position(bufnr, end_, client.offset_encoding)
-				vim.hl.range(bufnr, hover_ns, "LspReferenceTarget", { start.line, start_idx }, { end_.line, end_idx }, {
-					priority = vim.hl.priorities.user,
-				})
+				local range = vim.range.lsp(bufnr, result.range, client.offset_encoding)
+				vim.hl.range(
+					bufnr,
+					hover_ns,
+					"LspReferenceTarget",
+					{ range.start_row, range.start_col },
+					{ range.end_row, range.end_col },
+					{ priority = vim.hl.priorities.user }
+				)
 			end
 
 			contents[#contents + 1] = "---"
