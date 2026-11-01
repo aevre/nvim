@@ -24,7 +24,7 @@ return {
 		style = "default",
 		icons = {},
 		lsp_progress = true,
-		debug = vim.env.NVIM_PLUGIN_MODE == "dev",
+		debug = true,
 		merge_duplicates = 500,
 		routes = {
 			{
@@ -39,7 +39,15 @@ return {
 			{ match = { exact = { "notify" }, message = { [[\vsaved .*]] } }, to = "fidget" },
 			-- Route write confirmations and change summaries to Fidget; Vim regex, case-insensitive.
 			{ match = { exact = { "notify" }, message = { [[\v\c(written|已写入)]] } }, to = "fidget" },
-			{ match = { exact = { "notify" }, prefix = { "msg.show." }, message = { [[\v^\d+ (行(发生改变|被去掉|被加入)；before #|lines? (changed|removed|added); before #)]] } }, to = "fidget" },
+			{
+				match = {
+					exact = { "notify" },
+					message = {
+						[[\v^\d+ (行(发生改变|被去掉|被加入)；before #|(lines? (changed|removed|added|less)|fewer lines|more lines|changes?); (before|after) #)]],
+					},
+				},
+				to = "fidget",
+			},
 			-- Keep other vim.notify() messages in the regular notification backend.
 			{ match = { exact = { "notify" } }, to = "notify" },
 			{ match = { prefix = { "msg.show." } }, to = "notify" },
