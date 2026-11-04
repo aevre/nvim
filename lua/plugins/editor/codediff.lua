@@ -1,9 +1,16 @@
 ---@type LazyPluginSpec
 return {
-	"esmuellert/codediff.nvim",
-	cmd = "CodeDiff",
+	"dlyongemallo/diffview-plus.nvim",
+	version = "*",
+	cmd = {
+		"DiffviewOpen",
+		"DiffviewToggle",
+		"DiffviewFileHistory",
+		"DiffviewDiffFiles",
+		"DiffviewLog",
+	},
 	opts = {},
 	keys = {
-		{ "<leader>cD", "<cmd>CodeDiff<cr>", desc = "Code Diff" },
+		{ "<leader>cD", "<cmd>DiffviewToggle<cr>", desc = "Code Diff" },
 	},
 }
