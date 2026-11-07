@@ -25,7 +25,7 @@ return {
 		icons = {},
 		lsp_progress = true,
 		debug = true,
-		merge_duplicates = 500,
+		merge_duplicates = 3000,
 		routes = {
 			{
 				match = {
