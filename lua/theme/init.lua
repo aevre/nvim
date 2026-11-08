@@ -77,6 +77,19 @@ function M.get_palette()
 	return load_palette()
 end
 
+---@param plugin string
+---@param state? "declared"|"installed"|"loaded"|"imported"|"available"
+---@return boolean
+function M.has(plugin, state)
+	return require("theme.plugins").has(plugin, state)
+end
+
+---@param plugin string
+---@return theme.PluginStatus?
+function M.plugin_status(plugin)
+	return require("theme.plugins").status(plugin)
+end
+
 local neovide_transparent_opacity = tonumber(vim.g.neovide_opacity) or 1
 
 local function transparent_path()
