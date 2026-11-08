@@ -41,7 +41,7 @@ return {
 				match = {
 					exact = { "notify" },
 					message = {
-						[[\v^\d+ (行(发生改变|被去掉|被加入)；before #|(lines? (changed|removed|added|less)|fewer lines|more lines|changes?); (before|after) #)]],
+						[[\v^\d+ (行(发生改变|被去掉|被加入)；before #|(lines? (changed|removed|added|less)|fewer lines|more lines?|changes?); (before|after) #)]],
 					},
 				},
 				to = "fidget",

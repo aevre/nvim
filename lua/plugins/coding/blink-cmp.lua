@@ -166,11 +166,9 @@ return {
 				kind = {
 					highlight = function(ctx)
 						if vim.tbl_contains({ "Path" }, ctx.source_name) then
-							local type = ctx.item.data.type
-							if ctx.item.data.type == "link" then
-								type = "directory"
-							end
-							local mini_icon, mini_hl = require("mini.icons").get("default", type)
+							local path_type = ctx.item.data.type
+							local category = (path_type == "directory" or path_type == "link") and "directory" or "file"
+							local mini_icon, mini_hl = mini_icons.get("default", category)
 							if mini_icon then
 								return mini_hl
 							end
