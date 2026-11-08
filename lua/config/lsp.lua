@@ -10,13 +10,19 @@ local keys = {
 	},
 }
 
+local function fzf(method)
+	return function()
+		require("fzf-lua")[method]()
+	end
+end
+
 -- stylua: ignore
 local attached_keys = {
-	{ "gd", function() FzfLua.lsp_definitions() end, desc = "Goto Definition" },
-	{ "gr", function() FzfLua.lsp_references() end, desc = "References" },
-	{ "gI", function() FzfLua.lsp_implementations() end, desc = "Goto Implementation" },
-	{ "gy", function() FzfLua.lsp_typedefs() end, desc = "Goto T[y]pe Definition" },
-	{ "gD", function() FzfLua.lsp_declarations() end, desc = "Goto Declaration" },
+	{ "gd", fzf("lsp_definitions"), desc = "Goto Definition" },
+	{ "gr", fzf("lsp_references"), desc = "References" },
+	{ "gI", fzf("lsp_implementations"), desc = "Goto Implementation" },
+	{ "gy", fzf("lsp_typedefs"), desc = "Goto T[y]pe Definition" },
+	{ "gD", fzf("lsp_declarations"), desc = "Goto Declaration" },
 	{ "K", function() Utils.lsp.hover() end, desc = "Hover" },
 	{ "<leader>ca", vim.lsp.buf.code_action, mode = { "n", "x" }, desc = "Code Action" },
 	{ "<leader>cr", vim.lsp.buf.rename, desc = "Rename" },
@@ -29,12 +35,12 @@ local attached_keys = {
       vim.fn.delete(old)
     end
   end, desc = "Rename File" },
-	{ "<leader>ld", function() FzfLua.lsp_document_diagnostics() end, desc = "LSP Open Diagnostic" },
+	{ "<leader>ld", fzf("lsp_document_diagnostics"), desc = "LSP Open Diagnostic" },
 	{ "<leader>co", Utils.lsp.action["source.organizeImports"], desc = "Organize Imports" },
-	{ "gai", function() FzfLua.lsp_incoming_calls() end, desc = "Calls Incoming" },
-	{ "gao", function() FzfLua.lsp_outgoing_calls() end, desc = "Calls Outgoing" },
-	{ "<leader>ss", function() FzfLua.lsp_document_symbols() end, desc = "LSP Symbols" },
-	{ "<leader>sS", function() FzfLua.lsp_workspace_symbols() end, desc = "LSP Workspace Symbols" },
+	{ "gai", fzf("lsp_incoming_calls"), desc = "Calls Incoming" },
+	{ "gao", fzf("lsp_outgoing_calls"), desc = "Calls Outgoing" },
+	{ "<leader>ss", fzf("lsp_document_symbols"), desc = "LSP Symbols" },
+	{ "<leader>sS", fzf("lsp_workspace_symbols"), desc = "LSP Workspace Symbols" },
 }
 
 Utils.keymap.add(keys)

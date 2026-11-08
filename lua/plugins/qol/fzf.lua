@@ -2,7 +2,7 @@
 return {
 	"ibhagwan/fzf-lua",
 	dependencies = { "nvim-mini/mini.icons" },
-	lazy = false,
+	-- Loaded by its key mappings; external callers use require("fzf-lua").
 
 	---@module "fzf-lua"
 	---@type fzf-lua.Config | { }
