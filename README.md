@@ -81,7 +81,7 @@ lua/theme/                 Palette, highlights, and transparency
 palette.json               JSON overrides for the current theme
 lua/sources/               Language, LSP, notification, and icon sources for fzf
 lua/utils/                 Shared helpers
-snippets/                  Local LuaSnip snippets for Go, Java, and Vue
+snippets/                  Local VSCode-style snippets for Go, Java, and Vue
 after/ftplugin/            Filetype additions for Vue, Oil, and mini.files
 docs/                      English and Chinese reference guides
 lazy-lock.json             Plugin version lockfile

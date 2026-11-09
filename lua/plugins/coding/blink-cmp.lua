@@ -7,6 +7,7 @@ return {
 		dependencies = {
 			"milanglacier/minuet-ai.nvim",
 			"niuiic/blink-cmp-rg.nvim",
+			"rafamadriz/friendly-snippets",
 			"saghen/blink.lib",
 		},
 		-- version = "1.*",
@@ -55,7 +56,6 @@ return {
 				-- trigger = { show_on_insert = true },
 				window = { border = "rounded", treesitter_highlighting = true, show_documentation = true },
 			},
-			snippets = { preset = "luasnip" },
 			sources = {
 				default = { "lsp", "snippets", "path", "buffer", "ripgrep", "minuet" },
 				providers = {

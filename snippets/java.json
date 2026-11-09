@@ -1,0 +1,53 @@
+{
+  "Public record": {
+    "prefix": "record",
+    "description": "Public record (Java 16+)",
+    "body": [
+      "public record ${1:User}(${2:String name}) {",
+      "\t$0",
+      "}"
+    ]
+  },
+  "Switch expression": {
+    "prefix": "switch",
+    "description": "Switch expression (Java 14+)",
+    "body": [
+      "${1:String} ${2:result} = switch (${3:value}) {",
+      "\tcase ${4:0} -> ${5:\"zero\"};",
+      "\tdefault -> ${6:\"other\"};",
+      "};",
+      "$0"
+    ]
+  },
+  "Unwrap Optional": {
+    "prefix": "optional",
+    "description": "Unwrap Optional or throw",
+    "body": [
+      "${1:User} ${2:user} = ${3:optional}.orElseThrow(() -> new ${4:IllegalArgumentException}(\"${5:Not found}\"));",
+      "$0"
+    ]
+  },
+  "JUnit 5 test": {
+    "prefix": "test",
+    "description": "JUnit 5 test method (Test import required)",
+    "body": [
+      "@Test",
+      "void ${1:shouldWork}() {",
+      "\t$0",
+      "}"
+    ]
+  },
+  "JUnit 5 parameterized test": {
+    "prefix": "ptest",
+    "description": "JUnit 5 CSV parameterized test (ParameterizedTest, CsvSource imports required)",
+    "body": [
+      "@ParameterizedTest",
+      "@CsvSource({",
+      "\t\"${1:1, 2, 3}\"",
+      "})",
+      "void ${2:shouldAdd}(${3:int left, int right, int expected}) {",
+      "\t$0",
+      "}"
+    ]
+  }
+}

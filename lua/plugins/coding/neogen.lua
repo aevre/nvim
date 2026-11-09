@@ -3,7 +3,7 @@ return {
 	"danymat/neogen",
 	cmd = "Neogen",
 	opts = {
-		snippet_engine = "luasnip",
+		snippet_engine = "nvim",
 	},
 	keys = {
 		{

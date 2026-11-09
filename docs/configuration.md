@@ -12,8 +12,8 @@ Lazy imports `plugins` and the `coding`, `colorschemes`, `deps`, `editor`, `high
 | --- | --- |
 | Search | fzf-lua loads at startup and provides file, grep, Git, LSP, and custom sources |
 | File browsing | Oil loads at startup and takes over as the default explorer; mini.files is triggered by `<leader>e`; Oil diagnostics and Git extensions load for the `oil` filetype |
-| Completion | blink.cmp loads on `InsertEnter` / `CmdlineEnter`, using LSP, LuaSnip, path, buffer, ripgrep, and Minuet sources |
-| Snippets | LuaSnip + friendly-snippets, plus Lua snippets from `snippets/` |
+| Completion | blink.cmp loads on `InsertEnter` / `CmdlineEnter`, using LSP, native `vim.snippet`, path, buffer, ripgrep, and Minuet sources |
+| Snippets | Native `vim.snippet` + friendly-snippets, plus VSCode-style snippets from `snippets/` |
 | Editing | blink.pairs, mini.ai/jump/move/splitjoin/surround, ts-comments, and ts-autotag mostly load on `BufEdit`; Dial provides increment/decrement operations |
 | Navigation | Flash loads on `VeryLazy`; Treesitter textobjects load on `BufEdit` |
 | Formatting and linting | Conform and nvim-lint load on `BufEdit`, with tool associations supplied by toolchain |
@@ -66,7 +66,7 @@ The current model for Minuet and llm.nvim is `cohere/north-mini-code:free`; its 
 
 ## Filetypes and Theme
 
-`after/ftplugin/` provides additional behavior for Vue, Oil, and mini.files. Local LuaSnip files are `snippets/go/go.lua`, `snippets/java/java.lua`, and `snippets/vue/vue.lua`; snippet availability also depends on LuaSnip and friendly-snippets being loaded.
+`after/ftplugin/` provides additional behavior for Vue, Oil, and mini.files. Local VSCode-style snippets are registered by `snippets/package.json`; blink.cmp loads them together with friendly-snippets and expands them through native `vim.snippet`.
 
 `lua/config/filetype.lua` extends filename detection for shell dotfiles, Git configuration files, `Taskfile`, `Brewfile`, and other listed names, including their `.tmpl` and chezmoi-prefixed variants (such as `dot_zshrc` and `private_dot_zshrc.tmpl`).
 

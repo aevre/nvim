@@ -1,0 +1,10 @@
+{
+  "name": "nvim-local-snippets",
+  "contributes": {
+    "snippets": [
+      { "language": "go", "path": "./go.json" },
+      { "language": "java", "path": "./java.json" },
+      { "language": "vue", "path": "./vue.json" }
+    ]
+  }
+}

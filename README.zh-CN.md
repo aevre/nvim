@@ -81,7 +81,7 @@ lua/theme/                 调色板、高亮与透明背景
 palette.json               当前主题的 JSON 覆盖值
 lua/sources/               fzf 的语言、LSP、通知、图标数据源
 lua/utils/                 共享工具函数
-snippets/                  Go、Java、Vue 的本地 LuaSnip 片段
+snippets/                  Go、Java、Vue 的本地 VSCode 格式片段
 after/ftplugin/            Vue、Oil、mini.files 的文件类型补充
 docs/                      中英文参考文档
 lazy-lock.json             插件版本锁定

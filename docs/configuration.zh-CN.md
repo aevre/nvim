@@ -12,8 +12,8 @@ Lazy 导入 `plugins` 以及 `coding`、`colorschemes`、`deps`、`editor`、`hi
 | --- | --- |
 | 搜索 | fzf-lua 启动加载，提供文件、grep、Git、LSP 与自定义 source |
 | 文件浏览 | Oil 启动加载并接管默认 explorer；mini.files 由 `<leader>e` 触发；Oil 诊断与 Git 扩展按 `oil` filetype 加载 |
-| 补全 | blink.cmp 在 `InsertEnter` / `CmdlineEnter` 加载，使用 LSP、LuaSnip、path、buffer、ripgrep、Minuet 源 |
-| 片段 | LuaSnip + friendly-snippets，另加载 `snippets/` 中的 Lua 片段 |
+| 补全 | blink.cmp 在 `InsertEnter` / `CmdlineEnter` 加载，使用 LSP、原生 `vim.snippet`、path、buffer、ripgrep、Minuet 源 |
+| 片段 | 原生 `vim.snippet` + friendly-snippets，另加载 `snippets/` 中的 VSCode 格式片段 |
 | 编辑 | blink.pairs、mini.ai/jump/move/splitjoin/surround、ts-comments、ts-autotag 多在 `BufEdit` 加载；Dial 提供增减操作 |
 | 跳转 | Flash 在 `VeryLazy` 加载；Treesitter textobjects 在 `BufEdit` 加载 |
 | 格式化与检查 | Conform、nvim-lint 在 `BufEdit` 加载，工具关联由 toolchain 提供 |
@@ -66,7 +66,7 @@ Minuet 和 llm.nvim 当前模型为 `cohere/north-mini-code:free`；模型是否
 
 ## 文件类型与主题
 
-`after/ftplugin/` 为 Vue、Oil、mini.files 提供补充行为。本地 LuaSnip 文件为 `snippets/go/go.lua`、`snippets/java/java.lua` 和 `snippets/vue/vue.lua`；片段可用性还取决于 LuaSnip 和 friendly-snippets 的加载。
+`after/ftplugin/` 为 Vue、Oil、mini.files 提供补充行为。本地 VSCode 格式片段由 `snippets/package.json` 注册；blink.cmp 会将其与 friendly-snippets 一同加载，并通过原生 `vim.snippet` 展开。
 
 `lua/config/filetype.lua` 为 Shell dotfile、Git 配置文件、`Taskfile`、`Brewfile` 等列出的文件名补充类型检测，同时识别对应的 `.tmpl` 和 chezmoi 前缀变体，例如 `dot_zshrc`、`private_dot_zshrc.tmpl`。
 

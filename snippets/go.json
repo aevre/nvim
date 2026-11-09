@@ -1,0 +1,57 @@
+{
+  "Return an error": {
+    "prefix": "err",
+    "description": "Return an error",
+    "body": [
+      "if err != nil {",
+      "\treturn ${1:err}",
+      "}",
+      "$0"
+    ]
+  },
+  "Return an error with context": {
+    "prefix": "errw",
+    "description": "Return an error with context (fmt)",
+    "body": [
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"${1:operation}: %w\", err)",
+      "}",
+      "$0"
+    ]
+  },
+  "Context timeout": {
+    "prefix": "timeout",
+    "description": "Context timeout with deferred cancellation (context, time)",
+    "body": [
+      "${1:ctx}, ${2:cancel} := context.WithTimeout(${3:ctx}, ${4:5 * time.Second})",
+      "defer ${2}()",
+      "$0"
+    ]
+  },
+  "Deferred lock": {
+    "prefix": "lock",
+    "description": "Lock until the surrounding function returns",
+    "body": [
+      "${1:mu}.Lock()",
+      "defer ${1}.Unlock()",
+      "$0"
+    ]
+  },
+  "Pointer interface assertion": {
+    "prefix": "iface",
+    "description": "Compile-time pointer interface assertion",
+    "body": [
+      "var _ ${1:Interface} = (*${2:Type})(nil)",
+      "$0"
+    ]
+  },
+  "Named subtest": {
+    "prefix": "subtest",
+    "description": "Named subtest (testing)",
+    "body": [
+      "t.Run(\"${1:case}\", func(t *testing.T) {",
+      "\t$0",
+      "})"
+    ]
+  }
+}

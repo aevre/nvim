@@ -1,0 +1,96 @@
+{
+  "Vue 3 SFC template": {
+    "prefix": "tem",
+    "description": "Vue 3 Single File Component Template",
+    "body": [
+      "<script setup lang=\"${1:ts}\">",
+      "",
+      "</script>",
+      "",
+      "<template>",
+      "",
+      "</template>",
+      "",
+      "<style lang=\"${2:scss}\" scoped>",
+      "",
+      "</style>$0"
+    ]
+  },
+  "Typed props with defaults": {
+    "prefix": "props",
+    "description": "Typed props with defaults",
+    "body": [
+      "const props = withDefaults(defineProps<{",
+      "\t${1:title}?: ${2:string}",
+      "}>(), {",
+      "\t${1}: ${3:''},",
+      "})",
+      "$0"
+    ]
+  },
+  "Required typed model": {
+    "prefix": "model",
+    "description": "Required typed model (Vue 3.4+)",
+    "body": [
+      "const ${1:model} = defineModel<${2:string}>({ required: true })",
+      "$0"
+    ]
+  },
+  "Named required typed model": {
+    "prefix": "modeln",
+    "description": "Named required typed model (Vue 3.4+)",
+    "body": [
+      "const ${1:visible} = defineModel<${2:boolean}>('${1}', { required: true })",
+      "$0"
+    ]
+  },
+  "Typed slots": {
+    "prefix": "slots",
+    "description": "Typed slots (Vue 3.3+)",
+    "body": [
+      "defineSlots<{",
+      "\t${1:default}(props: { ${2:item}: ${3:Item} }): any",
+      "}>()",
+      "$0"
+    ]
+  },
+  "Expose component methods or state": {
+    "prefix": "expose",
+    "description": "Expose component methods or state",
+    "body": [
+      "defineExpose({ ${1:open} })",
+      "$0"
+    ]
+  },
+  "Watch a prop": {
+    "prefix": "watchp",
+    "description": "Watch a prop through a getter",
+    "body": [
+      "watch(() => props.${1:value}, (${2:value}, ${3:oldValue}) => {",
+      "\t$0",
+      "})"
+    ]
+  },
+  "Watch effect with cleanup": {
+    "prefix": "watche",
+    "description": "Watch effect with cleanup",
+    "body": [
+      "watchEffect((onCleanup) => {",
+      "\t${1:// Start the side effect}",
+      "\tonCleanup(() => {",
+      "\t\t${2:// Dispose the side effect}",
+      "\t})",
+      "\t$0",
+      "})"
+    ]
+  },
+  "Scoped slot template": {
+    "prefix": "slot",
+    "description": "Scoped slot template",
+    "body": [
+      "<template #${1:default}=\"{ ${2:item} }\">",
+      "\t$0",
+      "</template>"
+    ]
+  }
+}
