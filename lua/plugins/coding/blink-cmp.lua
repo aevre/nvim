@@ -18,12 +18,10 @@ return {
 		---@module 'blink.cmp'
 		---@type blink.cmp.Config
 		opts = {
-			appearance = { nerd_font_variant = "mono" },
 			cmdline = {
-				enabled = true,
 				completion = {
 					menu = { auto_show = true },
-					list = { selection = { preselect = false, auto_insert = true } },
+					list = { selection = { preselect = false } },
 				},
 			},
 			completion = {
@@ -42,19 +40,12 @@ return {
 					},
 				},
 				keyword = { range = "full" },
-				list = { selection = { preselect = false, auto_insert = true } },
+				list = { selection = { preselect = false } },
 				documentation = { auto_show = true, auto_show_delay_ms = 500, window = { border = "rounded" } },
-				trigger = {
-					show_on_keyword = true,
-					show_on_insert_on_trigger_character = true,
-					prefetch_on_insert = false,
-				},
-				accept = { dot_repeat = true, auto_brackets = { enabled = true } },
 			},
 			signature = {
 				enabled = true,
-				-- trigger = { show_on_insert = true },
-				window = { border = "rounded", treesitter_highlighting = true, show_documentation = true },
+				window = { border = "rounded", show_documentation = true },
 			},
 			sources = {
 				default = { "lsp", "snippets", "path", "buffer", "ripgrep", "minuet" },
@@ -94,19 +85,7 @@ return {
 			},
 			fuzzy = {
 				implementation = "prefer_rust",
-				max_typos = function(k)
-					return math.floor(#k / 4)
-				end,
-				frecency = {
-					enabled = true,
-					path = vim.fn.stdpath("state") .. "/blink/cmp/frecency.dat",
-				},
-				use_proximity = true,
-				sorts = {
-					"score",
-					"exact",
-					"sort_text",
-				},
+				sorts = { "exact", "score", "sort_text" },
 			},
 			keymap = {
 				preset = "none",
@@ -118,18 +97,18 @@ return {
         ['<Tab>'] = {'select_next', 'snippet_forward', 'fallback'},
         ['<C-b>'] = { 'scroll_documentation_up', 'fallback' },
         ['<C-f>'] = { 'scroll_documentation_down', 'fallback' },
-        ['<A-1>'] = { function(cmp) cmp.accept({ index = 1 }) end },
-        ['<A-2>'] = { function(cmp) cmp.accept({ index = 2 }) end },
-        ['<A-3>'] = { function(cmp) cmp.accept({ index = 3 }) end },
-        ['<A-4>'] = { function(cmp) cmp.accept({ index = 4 }) end },
-        ['<A-5>'] = { function(cmp) cmp.accept({ index = 5 }) end },
-        ['<A-6>'] = { function(cmp) cmp.accept({ index = 6 }) end },
-        ['<A-7>'] = { function(cmp) cmp.accept({ index = 7 }) end },
-        ['<A-8>'] = { function(cmp) cmp.accept({ index = 8 }) end },
-        ['<A-9>'] = { function(cmp) cmp.accept({ index = 9 }) end },
-        ['<A-0>'] = { function(cmp) cmp.accept({ index = 10 }) end },
-        ['<A-y>'] = { function() require('minuet').make_blink_map() end},
-				-- stylua: ignore start
+        ['<A-1>'] = { function(cmp) return cmp.accept({ index = 1 }) end },
+        ['<A-2>'] = { function(cmp) return cmp.accept({ index = 2 }) end },
+        ['<A-3>'] = { function(cmp) return cmp.accept({ index = 3 }) end },
+        ['<A-4>'] = { function(cmp) return cmp.accept({ index = 4 }) end },
+        ['<A-5>'] = { function(cmp) return cmp.accept({ index = 5 }) end },
+        ['<A-6>'] = { function(cmp) return cmp.accept({ index = 6 }) end },
+        ['<A-7>'] = { function(cmp) return cmp.accept({ index = 7 }) end },
+        ['<A-8>'] = { function(cmp) return cmp.accept({ index = 8 }) end },
+        ['<A-9>'] = { function(cmp) return cmp.accept({ index = 9 }) end },
+        ['<A-0>'] = { function(cmp) return cmp.accept({ index = 10 }) end },
+        ['<A-y>'] = { function(cmp) return cmp.show({ providers = { 'minuet' } }) end },
+				-- stylua: ignore end
 			},
 		},
 	},

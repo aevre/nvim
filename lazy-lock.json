@@ -43,7 +43,7 @@
   "neogen": { "branch": "main", "commit": "23e7e9f883d01289ebd90e98025acc860ea26366" },
   "neoscroll.nvim": { "branch": "master", "commit": "c8d29979cb0cb3a2437a8e0ae683fd82f340d3b8" },
   "noice.nvim": { "branch": "main", "commit": "7bfd942445fb63089b59f97ca487d605e715f155" },
-  "notify.nvim": { "branch": "master", "commit": "4e580bc9a3ddeb5b65ed5317f27929345d93f897" },
+  "notify.nvim": { "branch": "master", "commit": "059842a583bfc8b32afee67732bbb717555fa5c2" },
   "nui.nvim": { "branch": "main", "commit": "10fc361835c856ba4233ef5ea135b919bf3dce97" },
   "nvim-dap": { "branch": "master", "commit": "cfa2d58f4537aca6ca83e2de1a0d9f1491121264" },
   "nvim-dap-view": { "branch": "main", "commit": "bfaf50b3f513f78d8ab3e5fe02128dda05be4945" },
