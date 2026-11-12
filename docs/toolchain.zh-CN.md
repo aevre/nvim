@@ -194,8 +194,8 @@ Conform 的 `condition` 决定；这两个判断相互独立。某个 formatter 
 声明，并不表示它在每个项目中都会运行。
 
 Luau 通过语言规格使用 `stylua`。GraphQL 和 Handlebars 当前没有 formatter
-映射；需要时在语言规格中添加对应工具。Zsh 使用 `shfmt` 和共享的 Bash
-language server；ShellCheck 不支持 zsh，因此改用原生 `zsh -n` 语法检查。
+映射；需要时在语言规格中添加对应工具。Zsh 使用 `shfmt`；ShellCheck 和 Bash
+Language Server 均不支持 zsh，因此改用原生 `zsh -n` 语法检查。
 
 ## 当前语言清单
 
@@ -207,7 +207,7 @@ Web 格式化组合指 `prettier → biome → oxfmt`。
 | 规格 / filetype | Formatter | CLI linter | LSP |
 | --- | --- | --- | --- |
 | bash / bash, sh | shfmt | shellcheck | bash-language-server |
-| zsh / zsh | shfmt | zsh（`zsh -n`） | bash-language-server（共享） |
+| zsh / zsh | shfmt | zsh（`zsh -n`） | — |
 | c / c | clang_format | — | clangd |
 | cpp / cpp | clang_format | — | clangd |
 | css / css, scss, less | Web 组合 | — | css-lsp, css-variables-language-server, emmet-language-server, stylelint-language-server, tailwindcss, biome, oxfmt |

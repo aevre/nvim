@@ -9,10 +9,9 @@ return {
 			-- Prevent recursive scanning which will cause issues when opening a file
 			-- directly in the home directory (e.g. ~/foo.sh).
 			--
-			-- Include zsh files in background workspace analysis.
-			globPattern = vim.env.GLOB_PATTERN or "*@(.sh|.inc|.bash|.command|.zsh)",
+			globPattern = vim.env.GLOB_PATTERN or "*@(.sh|.inc|.bash|.command)",
 		},
 	},
-	filetypes = { "bash", "sh", "zsh" },
+	filetypes = { "bash", "sh" },
 	root_markers = { ".git" },
 }

@@ -164,7 +164,7 @@ Conform still uses the default behavior of the formatter list: if multiple forma
 
 Whether a formatter is installed is determined by the Mason package list, while whether a formatter is effective for the current project is determined by Conform's `condition`; these two decisions are independent. A formatter declared by a language specification does not mean that it will run in every project.
 
-GraphQL and Handlebars currently have no formatter mapping. Luau uses `stylua` through its language specification. Zsh uses `shfmt` and the shared Bash language server; ShellCheck does not support zsh, so its native `zsh -n` syntax check is used instead.
+GraphQL and Handlebars currently have no formatter mapping. Luau uses `stylua` through its language specification. Zsh uses `shfmt`; ShellCheck and Bash Language Server do not support zsh, so its native `zsh -n` syntax check is used instead.
 
 ## Current Language List
 
@@ -173,7 +173,7 @@ The table below lists the Conform formatter, CLI linter, and LSP declarations in
 | Specification / filetype | Formatter | CLI linter | LSP |
 | --- | --- | --- | --- |
 | bash / bash, sh | shfmt | shellcheck | bash-language-server |
-| zsh / zsh | shfmt | zsh (`zsh -n`) | bash-language-server (shared) |
+| zsh / zsh | shfmt | zsh (`zsh -n`) | — |
 | c / c | clang_format | — | clangd |
 | cpp / cpp | clang_format | — | clangd |
 | css / css, scss, less | Web combination | — | css-lsp, css-variables-language-server, emmet-language-server, stylelint-language-server, tailwindcss, biome, oxfmt |
@@ -254,7 +254,7 @@ Name mappings are located in `lua/toolchain/mason.lua`. Every LSP, formatter, or
 
 Debug adapter mappings are `delve -> delve`, `debugpy -> debugpy`, and `js-debug -> js-debug-adapter`. GDB has no Mason mapping. `require("toolchain").mason.extra_packages` is an empty list by default and can contain additional literal package names; those are included even for unknown filetypes. When a Mason registry refresh fails or a package does not exist, Mason itself reports the installation failure; this does not prevent language specifications from loading.
 
-LSPs are enabled by `FileType`: when a name mapping exists, the package must first be installed in Mason; without a mapping, `is_installed()` directly returns true, after which availability still depends on whether the command is executable. After installation succeeds, already-open buffers' services are retried. `dartls` has no Mason mapping and requires the Dart SDK; `rustfmt` is also unmapped and should be prepared separately. ESLint has no package name mapping, so CLI linting requires the project or PATH to provide it. `bacon-ls` has an explicit Mason mapping. The zsh filetype shares the `bash-language-server` package mapping with bash.
+LSPs are enabled by `FileType`: when a name mapping exists, the package must first be installed in Mason; without a mapping, `is_installed()` directly returns true, after which availability still depends on whether the command is executable. After installation succeeds, already-open buffers' services are retried. `dartls` has no Mason mapping and requires the Dart SDK; `rustfmt` is also unmapped and should be prepared separately. ESLint has no package name mapping, so CLI linting requires the project or PATH to provide it. `bacon-ls` has an explicit Mason mapping. The zsh filetype has no LSP package mapping; it uses the native `zsh -n` linter instead.
 
 Language filetypes trigger the first `vim.lsp.enable(name)` call; the server is then enabled globally. Its own filetypes and root rules determine later attachments. For example, opening Go first enables gopls, which can then attach to `gomod`, `gowork`, and `gotmpl` buffers even though those types are not in the Go language specification.
 
