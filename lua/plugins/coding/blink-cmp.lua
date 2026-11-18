@@ -25,6 +25,7 @@ return {
 				},
 			},
 			completion = {
+				trigger = { prefetch_on_insert = false },
 				menu = {
 					scrollbar = false,
 					border = "rounded",
@@ -48,8 +49,20 @@ return {
 				window = { border = "rounded", show_documentation = true },
 			},
 			sources = {
-				default = { "lsp", "snippets", "path", "buffer", "ripgrep", "minuet" },
+				default = { "lsp", "snippets", "path", "buffer", "ripgrep", "minuet", "complete_func" },
 				providers = {
+					complete_func = {
+						name = "CompleteFunc",
+						module = "blink.cmp.sources.complete_func",
+						enabled = function()
+							return vim.bo.completefunc ~= ""
+						end,
+						opts = {
+							complete_func = function()
+								return vim.bo.completefunc
+							end,
+						},
+					},
 					minuet = {
 						name = "minuet",
 						module = "minuet.blink",
@@ -107,7 +120,14 @@ return {
         ['<A-8>'] = { function(cmp) return cmp.accept({ index = 8 }) end },
         ['<A-9>'] = { function(cmp) return cmp.accept({ index = 9 }) end },
         ['<A-0>'] = { function(cmp) return cmp.accept({ index = 10 }) end },
-        ['<A-y>'] = { function(cmp) return cmp.show({ providers = { 'minuet' } }) end },
+        ['<A-y>'] = { function(cmp)
+          require('minuet').change_preset('openrouter')
+          return cmp.show({ providers = { 'minuet' } })
+        end },
+        ['<A-o>'] = { function(cmp)
+          require('minuet').change_preset('ollama')
+          return cmp.show({ providers = { 'minuet' } })
+        end },
 				-- stylua: ignore end
 			},
 		},
@@ -125,11 +145,13 @@ return {
 				kind_icon = {
 					ellipsis = false,
 					text = function(ctx)
-						local icon, _, _ = mini_icons.get("lsp", ctx.kind)
+						local kind = ctx.source_name == "minuet" and "minuet" or ctx.kind
+						local icon, _, _ = mini_icons.get("lsp", kind)
 						return icon .. (ctx.icon_gap or "")
 					end,
 					highlight = function(ctx)
-						local _, hl, _ = mini_icons.get("lsp", ctx.kind)
+						local kind = ctx.source_name == "minuet" and "minuet" or ctx.kind
+						local _, hl, _ = mini_icons.get("lsp", kind)
 						return hl
 					end,
 				},

@@ -26,6 +26,7 @@ M.plugins = {
 	{ id = "fzf-lua", adapter = "fzf", modules = { "fzf-lua" }, repos = { "ibhagwan/fzf-lua" } },
 	{ id = "grug-far.nvim", adapter = "grug-far", modules = { "grug-far" }, repos = { "MagicDuck/grug-far.nvim" } },
 	{ id = "lazy.nvim", adapter = "lazy", modules = { "lazy" }, repos = { "folke/lazy.nvim" } },
+	{ id = "luma.nvim", adapter = "luma", modules = { "luma" }, repos = { "aevre/luma.nvim" } },
 	{ id = "mini.diff", adapter = "mini_diff", modules = { "mini.diff" }, repos = { "nvim-mini/mini.diff" } },
 	{ id = "mini.files", adapter = "mini_files", modules = { "mini.files" }, repos = { "nvim-mini/mini.files" } },
 	{
