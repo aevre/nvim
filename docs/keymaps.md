@@ -212,33 +212,27 @@ Generate annotations with `<leader>cn` (`n`, [neogen.lua](../lua/plugins/coding/
 
 Source: [oil.lua](../lua/plugins/qol/oil.lua), [mini-files.lua](../lua/plugins/qol/mini-files.lua), [autocmds.lua](../lua/config/autocmds.lua). Oil uses `use_default_keymaps = false`; the table lists only explicit configuration. [oil.lua](../after/ftplugin/oil.lua) and [minifiles.lua](../after/ftplugin/minifiles.lua) only set completion variables; [vue.lua](../after/ftplugin/vue.lua) only configures highlighting and language services, and none of the three adds mappings.
 
-## LLM, HTTP, and Preview
+## Luma, HTTP, and Preview
 
 | Key | Mode | Action |
 | --- | --- | --- |
-| `<leader>ac` | `n` | Toggle the LLM session |
-| `<leader>aa` / `<leader>ak` | `n,v` | Ask a multi-turn question / ask a question |
-| `<leader>ae` / `<leader>aw` | `n,v` / `n,x` | Explain code / translate a word |
-| `<leader>at` | `n` | Translate |
-| `<leader>aT` / `<leader>ao` / `<leader>ad` | `x` / `x` / `v` | Generate tests / optimize comparison / docstring |
-| `<leader>ag` / `<leader>au` | `n` | Generate a commit message / view account |
-| `<leader>ab` / `<leader>ai` | `n,v` | Bash runner / formula recognition |
-| `<C-g>` / `<C-c>` / `<C-r>` | LLM input `i,n` | Submit / cancel / resend |
-| `<C-j>` / `<C-k>` | LLM input `i,n` | Next / previous history item |
-| `<C-S-J>` / `<C-S-K>` | LLM input `i,n` | Next / previous model |
-| `i` / `<C-w>` | LLM output `n` | Focus input; `<C-w>` in the input area (`n,i`) focuses output |
-| `<C-c>` / `<C-r>` | LLM split output `n` | Cancel / resend |
-| `q` / `<Esc>` | LLM float `n` | Hide / close the session |
-| `<C-n>` / `<C-h>` | LLM float `n` | New session / session history |
-| `<C-b>` / `<C-f>`, `<C-u>` / `<C-d>` | LLM `i,n` | Page / half-page scroll |
-| `gg` / `G` | LLM `n` | Jump to top / bottom |
+| `<leader>ac` | `n` | Toggle Luma chat |
+| `<leader>aa` | `x` | Attach the selection to chat |
+| `<leader>ak` | `n` | Ask Luma |
+| `<leader>ae` | `n,x` | Explain the buffer or selection |
+| `<leader>aw` | `n,x` | Translate the word under cursor or the selection |
+| `<leader>at` | `n` | Open Luma chat with a translation instruction |
+| `<leader>aT` / `<leader>ao` | `x` | Generate tests / rewrite |
+| `<leader>ag` / `<leader>ab` | `n` / `n,x` | Generate a commit message / Bash script |
+| `<leader>an` / `<leader>ah` / `<leader>am` | `n` | New chat / history / model selector |
+| `<leader>ax` | `n` | Cancel the current request |
+| `<C-s>` / `<C-c>` / `<C-r>` | Luma prompt `i,n` | Submit / cancel / resend |
+| `i` / `o` / `m` / `h` | Luma windows `n` | Focus prompt / chat / models / history |
+| `q` | Luma windows `n` | Close the complete chat window group |
 | `<leader>Rc/Re/Rf/Rp/Rs/RS/Rq` | `n` | HTTP copy cURL / environment / environment file / profiling / execute / dry-run / stop |
 | `<leader>cps/cpc/cpp` | `n` | Live Preview start / close / select |
-| `d`, `y/Y`, `n/N`, `<Esc>` | LLM Ask window `n` | Show, accept, reject, close |
-| `<CR>` | LLM commit window `n` | Actually execute `git commit -m ...`, then open Lazygit |
-| `<C-f>` | LLM formula input `i` | Select an image |
 
-Source: [llm/init.lua](../lua/plugins/qol/llm/init.lua), [llm/keymaps.lua](../lua/plugins/qol/llm/keymaps.lua), [llm/extensions/ask.lua](../lua/plugins/qol/llm/extensions/ask.lua), [llm/extensions/commit_msg.lua](../lua/plugins/qol/llm/extensions/commit_msg.lua), [llm/extensions/formula_recognition.lua](../lua/plugins/qol/llm/extensions/formula_recognition.lua), [http-client.lua](../lua/plugins/coding/http-client.lua), [live-preview.lua](../lua/plugins/qol/live-preview.lua).
+Source: [luma/init.lua](../lua/plugins/qol/luma/init.lua), [luma/tools/init.lua](../lua/plugins/qol/luma/tools/init.lua), [http-client.lua](../lua/plugins/coding/http-client.lua), [live-preview.lua](../lua/plugins/qol/live-preview.lua).
 
 ## Help, Exit, and Troubleshooting
 

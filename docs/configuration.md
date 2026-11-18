@@ -25,7 +25,7 @@ Lazy imports `plugins` and the `coding`, `colorschemes`, `deps`, `editor`, `high
 | Messages and diagnostics | cmdline.nvim and notify.nvim load at startup for command-line/message UI and notifications; notify.nvim also handles LSP progress; tiny-inline-diagnostic loads on `LspAttach` and disables native virtual text |
 | Other | Which-key loads on `VeryLazy`; Yanky and Screenkey are triggered by keymaps; WakaTime loads on `BufEdit` |
 | HTTP | nvim-http-client loads through `VeryLazy`, `http/rest`, or keymaps; it searches upward for `http-client.env.json` |
-| AI | Minuet and llm.nvim are both configured to load on `BufEdit`; Minuet is also a dependency of blink.cmp |
+| AI | Luma loads from the local `~/Projects/lib/luma.nvim` checkout on `BufReadPost`; Minuet is a dependency of blink.cmp |
 
 Explicitly disabled specs: persistence.nvim, noice.nvim, nvim-notify, refactoring.nvim, mini.pairs, rainbow-delimiters.nvim, tiny-cmdline.nvim, transparent.nvim, mini.clue, neoscroll.nvim, snacks.nvim, and treesitter-parser-registry. `lspconfig.lua` returns an empty table; LSP is currently configured without the nvim-lspconfig plugin. Transparency comes from the local theme module and is unrelated to the disabled transparent.nvim.
 
@@ -59,10 +59,10 @@ Debugging uses the toolchain's DAP specs and adds only `nvim-dap` plus `nvim-dap
 | Qt/QML environment | `qmlls` and the Qt tools required by the project |
 | Input method commands | The non-Windows branch checks `fcitx5-remote`, `fcitx-remote`, and `ibus` in order; if none is found, it warns and falls back to the fcitx5 command name |
 | WakaTime account configuration | The WakaTime plugin is enabled; you need to complete authentication yourself |
-| `OPENROUTER_TOKEN` | Minuet completion and llm.nvim's current OpenRouter model |
-| `TAVILY_TOKEN` | llm.nvim web search |
+| `OPENROUTER_TOKEN` | Minuet completion and Luma's OpenRouter model |
+| `TAVILY_TOKEN` | Luma web search |
 
-The current model for Minuet and llm.nvim is `cohere/north-mini-code:free`; its continued availability depends on the service provider. Definitions for other providers in `llm/models.lua` are not included in the current `models` list and do not indicate that those providers are enabled by default. Chat history is saved in `stdpath('cache')/llm-history`. LLM extensions cover Q&A, code explanation, translation, test/documentation generation, commit messages, and BashRunner. Read the corresponding extension before invoking it, especially BashRunner's command execution behavior.
+Minuet and Luma currently use `cohere/north-mini-code:free`; its continued availability depends on the service provider. Luma chat history is saved in `stdpath('cache')/luma-history`, with at most 15 entries. User-defined Luma tools live in separate `lua/plugins/qol/luma/tools/*.lua` modules, so prompts and behavior can be customized per tool; for example, the commit prompt is in `tools/commit.lua`. `tools/translate.lua` opens an independent one-shot translator: each submission uses only the translation prompt and current input, clears the prompt, and saves history under `luma-history/tools/translate` without touching the main chat. Press `m` to switch its model and `h` to inspect translation history. `tools/word_translate.lua` translates the word under the cursor or a visual selection. Set `model = "name"` in either tool module to choose a tool-specific default; `nil` follows the global model. Commit and Bash execution require explicit confirmation in those user tool modules.
 
 ## Filetypes and Theme
 

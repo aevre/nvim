@@ -212,33 +212,27 @@
 
 来源：[oil.lua](../lua/plugins/qol/oil.lua)、[mini-files.lua](../lua/plugins/qol/mini-files.lua)、[autocmds.lua](../lua/config/autocmds.lua)。Oil 使用 `use_default_keymaps = false`，表中只列显式配置。[oil.lua](../after/ftplugin/oil.lua) 和 [minifiles.lua](../after/ftplugin/minifiles.lua) 只设置补全变量；[vue.lua](../after/ftplugin/vue.lua) 只配置高亮与语言服务，三者都没有额外映射。
 
-## LLM、HTTP 与预览
+## Luma、HTTP 与预览
 
 | 按键 | 模式 | 用途 |
 | --- | --- | --- |
-| `<leader>ac` | `n` | LLM 会话开关 |
-| `<leader>aa` / `<leader>ak` | `n,v` | 多轮提问 / 提问 |
-| `<leader>ae` / `<leader>aw` | `n,v` / `n,x` | 解释代码 / 单词翻译 |
-| `<leader>at` | `n` | 翻译 |
-| `<leader>aT` / `<leader>ao` / `<leader>ad` | `x` / `x` / `v` | 生成测试 / 优化比较 / docstring |
-| `<leader>ag` / `<leader>au` | `n` | 生成 commit message / 查看账户 |
-| `<leader>ab` / `<leader>ai` | `n,v` | Bash runner / 公式识别 |
-| `<C-g>` / `<C-c>` / `<C-r>` | LLM 输入 `i,n` | 提交 / 取消 / 重发 |
-| `<C-j>` / `<C-k>` | LLM 输入 `i,n` | 下一个 / 上一个历史 |
-| `<C-S-J>` / `<C-S-K>` | LLM 输入 `i,n` | 下一个 / 上一个模型 |
-| `i` / `<C-w>` | LLM 输出 `n` | 聚焦输入；输入区 `<C-w>`（`n,i`）聚焦输出 |
-| `<C-c>` / `<C-r>` | LLM split 输出 `n` | 取消 / 重发 |
-| `q` / `<Esc>` | LLM float `n` | 隐藏 / 关闭会话 |
-| `<C-n>` / `<C-h>` | LLM float `n` | 新会话 / 会话历史 |
-| `<C-b>` / `<C-f>`、`<C-u>` / `<C-d>` | LLM `i,n` | 翻页 / 半页滚动 |
-| `gg` / `G` | LLM `n` | 跳到顶部 / 底部 |
+| `<leader>ac` | `n` | 打开或关闭 Luma 聊天 |
+| `<leader>aa` | `x` | 将选区附加到聊天 |
+| `<leader>ak` | `n` | 向 Luma 提问 |
+| `<leader>ae` | `n,x` | 解释当前缓冲区或选区 |
+| `<leader>aw` | `n,x` | 翻译光标下单词或选区 |
+| `<leader>at` | `n` | 打开预填翻译指令的 Luma Chat |
+| `<leader>aT` / `<leader>ao` | `x` | 生成测试 / 改写 |
+| `<leader>ag` / `<leader>ab` | `n` / `n,x` | 生成提交信息 / Bash 脚本 |
+| `<leader>an` / `<leader>ah` / `<leader>am` | `n` | 新建聊天 / 历史 / 模型选择 |
+| `<leader>ax` | `n` | 取消当前请求 |
+| `<C-s>` / `<C-c>` / `<C-r>` | Luma Prompt `i,n` | 提交 / 取消 / 重发 |
+| `i` / `o` / `m` / `h` | Luma 窗口 `n` | 聚焦 Prompt / Chat / Models / History |
+| `q` | Luma 窗口 `n` | 关闭整个聊天窗口组 |
 | `<leader>Rc/Re/Rf/Rp/Rs/RS/Rq` | `n` | HTTP 复制 cURL / 环境 / 环境文件 / profiling / 执行 / dry-run / 停止 |
 | `<leader>cps/cpc/cpp` | `n` | Live Preview 启动 / 关闭 / 选择 |
-| `d`、`y/Y`、`n/N`、`<Esc>` | LLM Ask 窗口 `n` | 显示、接受、拒绝、关闭 |
-| `<CR>` | LLM commit 窗口 `n` | 实际执行 `git commit -m ...`，然后打开 Lazygit |
-| `<C-f>` | LLM 公式输入 `i` | 选择图片 |
 
-来源：[llm/init.lua](../lua/plugins/qol/llm/init.lua)、[llm/keymaps.lua](../lua/plugins/qol/llm/keymaps.lua)、[llm/extensions/ask.lua](../lua/plugins/qol/llm/extensions/ask.lua)、[llm/extensions/commit_msg.lua](../lua/plugins/qol/llm/extensions/commit_msg.lua)、[llm/extensions/formula_recognition.lua](../lua/plugins/qol/llm/extensions/formula_recognition.lua)、[http-client.lua](../lua/plugins/coding/http-client.lua)、[live-preview.lua](../lua/plugins/qol/live-preview.lua)。
+来源：[luma/init.lua](../lua/plugins/qol/luma/init.lua)、[luma/tools/init.lua](../lua/plugins/qol/luma/tools/init.lua)、[http-client.lua](../lua/plugins/coding/http-client.lua)、[live-preview.lua](../lua/plugins/qol/live-preview.lua)。
 
 ## 帮助与退出
 

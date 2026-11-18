@@ -25,7 +25,7 @@ Lazy 导入 `plugins` 以及 `coding`、`colorschemes`、`deps`、`editor`、`hi
 | 消息与诊断 | cmdline.nvim 与 notify.nvim 启动加载，负责命令行/消息界面与通知；notify.nvim 同时处理 LSP 进度；tiny-inline-diagnostic 在 `LspAttach` 加载并关闭原生 virtual text |
 | 其他 | Which-key 在 `VeryLazy`，Yanky 和 Screenkey 由键位触发；WakaTime 在 `BufEdit` |
 | HTTP | nvim-http-client 通过 `VeryLazy`、`http/rest` 或快捷键加载；向上查找 `http-client.env.json` |
-| AI | Minuet 与 llm.nvim 均配置为 `BufEdit` 加载；Minuet 也是 blink.cmp 的依赖 |
+| AI | Luma 在 `BufReadPost` 从本地 `~/Projects/lib/luma.nvim` 加载；Minuet 是 blink.cmp 的依赖 |
 
 明确禁用的 spec：persistence.nvim、noice.nvim、nvim-notify、refactoring.nvim、mini.pairs、rainbow-delimiters.nvim、tiny-cmdline.nvim、transparent.nvim、mini.clue、neoscroll.nvim、snacks.nvim、treesitter-parser-registry。`lspconfig.lua` 返回空表，当前不使用 nvim-lspconfig 插件配置 LSP。透明效果来自本地主题模块，与禁用的 transparent.nvim 无关。
 
@@ -59,10 +59,10 @@ Treesitter 使用 `main` 分支，在 `BufReadPre`、`BufNewFile` 或 `VeryLazy`
 | Qt/QML 环境 | `qmlls` 及项目所需 Qt 工具 |
 | 输入法命令 | 非 Windows 分支依次检测 `fcitx5-remote`、`fcitx-remote`、`ibus`；未找到会警告并回退到 fcitx5 命令名 |
 | WakaTime 账户配置 | 已启用 WakaTime 插件，需要自行完成认证 |
-| `OPENROUTER_TOKEN` | Minuet 补全及 llm.nvim 当前 OpenRouter 模型 |
-| `TAVILY_TOKEN` | llm.nvim 网页搜索 |
+| `OPENROUTER_TOKEN` | Minuet 补全及 Luma 的 OpenRouter 模型 |
+| `TAVILY_TOKEN` | Luma 网页搜索 |
 
-Minuet 和 llm.nvim 当前模型为 `cohere/north-mini-code:free`；模型是否仍可用取决于服务端。`llm/models.lua` 中其他 provider 的定义没有加入当前 `models` 列表，不表示默认启用。聊天历史保存于 `stdpath('cache')/llm-history`。LLM 扩展覆盖问答、代码解释、翻译、测试/文档生成、提交信息和 BashRunner；调用前应阅读对应扩展，尤其 BashRunner 的命令执行行为。
+Minuet 和 Luma 当前使用 `cohere/north-mini-code:free`；模型是否仍可用取决于服务端。Luma 聊天历史保存于 `stdpath('cache')/luma-history`，最多保留 15 条。用户定义的 Luma 工具按 `lua/plugins/qol/luma/tools/*.lua` 分模块保存，可分别修改提示词和行为，例如提交信息提示词位于 `tools/commit.lua`。`tools/translate.lua` 打开独立的一次性翻译窗口：每次提交只发送翻译提示词和当前输入，随后清空输入，并将历史保存到 `luma-history/tools/translate`，不会修改主 Chat。窗口内按 `m` 切换模型，按 `h` 查看翻译历史。`tools/word_translate.lua` 翻译光标下单词或可视选区。可在任一工具模块中设置 `model = "模型名"` 作为工具默认模型；`nil` 表示跟随全局模型。提交和 Bash 执行仍在对应用户工具模块中要求显式确认。
 
 ## 文件类型与主题
 
