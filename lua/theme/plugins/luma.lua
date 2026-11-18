@@ -19,7 +19,9 @@ function M.get(palette, opts)
 		LumaUser = { fg = palette.primary or palette.blue, bold = true },
 		LumaAssistant = { fg = palette.green or palette.fg, bold = true },
 		LumaError = { fg = diag.error or palette.red, bold = true },
-		LumaLoading = { fg = palette.primary_bright or palette.primary or palette.blue, bold = true },
+		LumaLoading = { fg = palette.primary_bright or palette.primary or palette.blue, bg = float_bg, bold = true },
+		LumaLoadingBorder = { fg = border, bg = float_bg },
+		LumaResultBorder = { fg = diag.ok or palette.green or border, bg = float_bg },
 	}
 end
 
