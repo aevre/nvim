@@ -1,6 +1,8 @@
 local SYSTEM_PROMPT =
 	"Write a Bash script for the requested task. Return only the script without Markdown fences. Do not execute it."
 
+---@param script string
+---@param output luma.Window
 local function run(script, output)
 	vim.system({ "bash", "-c", script }, { text = true }, function(result)
 		vim.schedule(function()
@@ -18,6 +20,8 @@ local function run(script, output)
 	end)
 end
 
+---@param script string
+---@param output luma.Window
 local function configure_output(script, output)
 	output:set_title(" Review generated script · r execute with Bash · y copy script ")
 	vim.keymap.set("n", "r", function()
@@ -29,6 +33,7 @@ local function configure_output(script, output)
 	end, { buffer = output.buf, desc = "Copy the generated Bash script to the clipboard" })
 end
 
+---@param ctx luma.ToolContext
 return function(ctx)
 	local request = ctx.has_range and ctx.source(true) or vim.fn.input("Bash task: ")
 	if not request or request == "" then

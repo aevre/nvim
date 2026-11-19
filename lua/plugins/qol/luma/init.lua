@@ -1,4 +1,4 @@
----@type LazySpec
+---@type LazyPluginSpec
 return {
 	"aevre/luma.nvim",
 	dir = vim.env.NVIM_PLUGIN_MODE == "dev" and vim.fn.expand("~/Projects/lib/luma.nvim") or nil,
@@ -8,6 +8,7 @@ return {
 		"win.nvim",
 		"animate.nvim",
 	},
+	---@type luma.ConfigInput
 	opts = {
 		model = "openrouter",
 		prompt = "You are a helpful Chinese coding assistant.",

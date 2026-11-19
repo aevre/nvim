@@ -1,3 +1,4 @@
+---@param ctx luma.ToolContext
 return function(ctx)
 	if not ctx.has_range then
 		vim.notify("luma: attach requires a visual selection", vim.log.levels.ERROR)

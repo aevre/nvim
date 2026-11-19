@@ -1,6 +1,7 @@
 local SYSTEM_PROMPT =
 	"Rewrite the supplied text. Return only the replacement text without Markdown fences or explanation."
 
+---@param ctx luma.ToolContext
 return function(ctx)
 	if not ctx.has_range then
 		vim.notify("luma: rewrite requires a visual selection", vim.log.levels.ERROR)
@@ -8,9 +9,10 @@ return function(ctx)
 	end
 
 	local text, range = ctx.visual()
-	if not text then
+	if not text or type(range) ~= "table" then
 		return
 	end
+	---@cast range luma.RewriteRange
 
 	local instruction = vim.fn.input("Rewrite instruction: ")
 	if instruction == "" then

@@ -1,4 +1,4 @@
-return {
+return { ---@type table<string, luma.ToolSpec|fun(ctx: luma.ToolContext)>
 	ask = require("plugins.qol.luma.tools.ask"),
 	attach = require("plugins.qol.luma.tools.attach"),
 	explain = require("plugins.qol.luma.tools.explain"),

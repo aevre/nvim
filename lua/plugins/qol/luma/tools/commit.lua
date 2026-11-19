@@ -1,14 +1,41 @@
 local SYSTEM_PROMPT = [[
-Generate a Conventional Commit message from the staged diff.
+Generate one high-quality Git commit message from the staged diff.
 
-Requirements:
-- Use `type: concise description` for the first line.
-- Add concise bullet points only when they provide useful detail.
-- Keep every line at most 72 characters.
-- Base the message strictly on the staged diff.
-- Return only the commit message.
+Follow Conventional Commits exactly:
+- Header format: `type(scope)!: subject` or `type: subject`.
+- Allowed types: feat, fix, refactor, perf, docs, test, build, ci,
+  chore, style, revert.
+- Use a scope only when the diff clearly belongs to one stable component.
+  Keep it short, lowercase, and omit it when uncertain.
+- Use `!` only for a breaking API, behavior, data, or configuration change.
+
+Header rules:
+- Write in English and use the imperative mood.
+- Start the subject with a lowercase word.
+- Describe the primary intent, not filenames or implementation mechanics.
+- Be specific; avoid vague words such as update, changes, tweaks, or fixes.
+- Do not end with a period.
+- Keep the entire header at most 72 characters.
+
+Body rules:
+- Omit the body when the header fully explains the change.
+- Otherwise add a blank line followed by 1-4 concise `- ` bullets.
+- Explain material behavior, rationale, or constraints not clear from the
+  header. Do not list every file or restate the header.
+- Keep every body line at most 72 characters.
+- Add `BREAKING CHANGE: ...` after a blank line only when the diff proves a
+  breaking change.
+
+Choose the type from the primary intent of the staged diff. Summarize mixed
+changes as one cohesive commit; do not invent issue IDs, behavior, tests, or
+motivation not present in the diff. Base every claim strictly on the staged
+diff.
+
+Return only the raw commit message without Markdown fences or explanation.
 ]]
 
+---@param message string
+---@param output luma.Window
 local function commit(message, output)
 	vim.system({ "git", "commit", "-F", "-" }, { text = true, stdin = message }, function(result)
 		vim.schedule(function()
@@ -26,8 +53,10 @@ local function commit(message, output)
 	end)
 end
 
+---@param message string
+---@param output luma.Window
 local function configure_output(message, output)
-	output:set_title(" Review generated message · c commit staged changes · y copy message ")
+	output:set_title(" c commit staged changes · y copy message ")
 	vim.keymap.set("n", "c", function()
 		commit(message, output)
 	end, { buffer = output.buf, desc = "Commit staged changes using the generated message" })
@@ -37,6 +66,7 @@ local function configure_output(message, output)
 	end, { buffer = output.buf, desc = "Copy the generated commit message to the clipboard" })
 end
 
+---@param ctx luma.ToolContext
 return function(ctx)
 	vim.system({ "git", "diff", "--no-ext-diff", "--staged" }, { text = true }, function(result)
 		vim.schedule(function()
