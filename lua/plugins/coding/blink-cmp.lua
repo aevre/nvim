@@ -140,14 +140,54 @@ return {
 		opts = function(_, opts)
 			local mini_icons = require("mini.icons")
 			local colorful_menu = require("colorful-menu")
+			local kind_icons = {
+				Array = "󰅪",
+				Boolean = "󰨙",
+				Class = "󰠱",
+				Color = "󰏘",
+				Constant = "󰏿",
+				Constructor = "",
+				Enum = "",
+				EnumMember = "",
+				Event = "",
+				Field = "󰜢",
+				File = "󰈙",
+				Folder = "󰉋",
+				Function = "󰊕",
+				Interface = "",
+				Key = "󰌋",
+				Keyword = "󰌋",
+				Method = "󰡱",
+				Module = "󰏗",
+				Namespace = "󰏗",
+				Null = "󰟢",
+				Number = "󰎠",
+				Object = "󰅩",
+				Operator = "󰆕",
+				Package = "󰏗",
+				Property = "󰜢",
+				Reference = "󰈇",
+				Snippet = "󰲋",
+				String = "󰉿",
+				Struct = "󰙅",
+				Text = "󰉿",
+				TypeParameter = "󰊄",
+				Unit = "󰑭",
+				Value = "󰎠",
+				Variable = "󰫧",
+				minuet = "󰚩",
+			}
 
 			opts.completion.menu.draw.components = vim.tbl_extend("force", opts.completion.menu.draw.components or {}, {
 				kind_icon = {
 					ellipsis = false,
 					text = function(ctx)
 						local kind = ctx.source_name == "minuet" and "minuet" or ctx.kind
-						local icon, _, _ = mini_icons.get("lsp", kind)
-						return icon .. (ctx.icon_gap or "")
+						local icon = kind_icons[kind]
+						if not icon then
+							icon = mini_icons.get("lsp", kind)
+						end
+						return (icon or "") .. (ctx.icon_gap or "")
 					end,
 					highlight = function(ctx)
 						local kind = ctx.source_name == "minuet" and "minuet" or ctx.kind
