@@ -34,10 +34,10 @@ diff.
 Return only the raw commit message without Markdown fences or explanation.
 ]]
 
----@param message string
----@param output luma.Window
-local function commit(message, output)
-	vim.system({ "git", "commit", "-F", "-" }, { text = true, stdin = message }, function(result)
+---@param output luma.ResultWindow
+local function commit(output)
+	local commit_message = output:get_text()
+	vim.system({ "git", "commit", "-F", "-" }, { text = true, stdin = commit_message }, function(result)
 		vim.schedule(function()
 			if result.code ~= 0 then
 				vim.notify("luma: " .. vim.trim(result.stderr), vim.log.levels.ERROR)
@@ -53,15 +53,15 @@ local function commit(message, output)
 	end)
 end
 
----@param message string
----@param output luma.Window
-local function configure_output(message, output)
+---@param _message string
+---@param output luma.ResultWindow
+local function configure_output(_message, output)
 	output:set_title(" c commit staged changes · y copy message ")
 	vim.keymap.set("n", "c", function()
-		commit(message, output)
+		commit(output)
 	end, { buffer = output.buf, desc = "Commit staged changes using the generated message" })
 	vim.keymap.set("n", "y", function()
-		vim.fn.setreg("+", message)
+		vim.fn.setreg("+", output:get_text())
 		vim.notify("luma: commit message copied")
 	end, { buffer = output.buf, desc = "Copy the generated commit message to the clipboard" })
 end
@@ -84,6 +84,7 @@ return function(ctx)
 				system = SYSTEM_PROMPT,
 				user = result.stdout,
 				loading = "正在生成提交信息",
+				editable = true,
 				on_done = configure_output,
 			})
 		end)
