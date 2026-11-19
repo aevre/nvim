@@ -49,7 +49,16 @@ return {
 				window = { border = "rounded", show_documentation = true },
 			},
 			sources = {
-				default = { "lsp", "snippets", "path", "buffer", "ripgrep", "minuet", "complete_func" },
+				default = {
+					"complete_func",
+					"omnifunc",
+					"lsp",
+					"snippets",
+					"path",
+					"buffer",
+					"ripgrep",
+					"minuet",
+				},
 				providers = {
 					complete_func = {
 						name = "CompleteFunc",
@@ -60,6 +69,18 @@ return {
 						opts = {
 							complete_func = function()
 								return vim.bo.completefunc
+							end,
+						},
+					},
+					omnifunc = {
+						name = "OmniFunc",
+						module = "blink.cmp.sources.complete_func",
+						enabled = function()
+							return vim.bo.omnifunc ~= ""
+						end,
+						opts = {
+							complete_func = function()
+								return vim.bo.omnifunc
 							end,
 						},
 					},

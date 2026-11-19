@@ -4,6 +4,9 @@ return {
 	event = "VeryLazy",
 	ft = { "http", "rest" },
 	dependencies = { "nvim-lua/plenary.nvim" },
+	init = function()
+		vim.filetype.add({ extension = { http = "http", rest = "http" } })
+	end,
 	config = function()
 		local http_client = require("http_client")
 		http_client.setup({
@@ -11,10 +14,96 @@ return {
 			default_env_file = "http-client.env.json",
 		})
 
+		-- The plugin only clears its active request on successful curl callbacks.
+		local core = http_client.http_client
+		local send_request = core.send_request
+		rawset(core, "send_request", function(request)
+			local curl = require("plenary.curl")
+			local curl_request = curl.request
+			curl.request = function(options)
+				local on_error = options.on_error
+				options.on_error = function(err)
+					core.clear_current_request()
+					if on_error then
+						return on_error(err)
+					end
+					vim.schedule(function()
+						vim.notify(err.message or tostring(err), vim.log.levels.ERROR)
+					end)
+				end
+				return curl_request(options)
+			end
+
+			local ok, result = pcall(send_request, request)
+			curl.request = curl_request
+			if not ok then
+				error(result)
+			end
+			return result
+		end)
+
+		local parser = http_client.parser
+		local parse_request = parser.parse_request
+		rawset(parser, "parse_request", function(lines)
+			local request_lines = vim.tbl_filter(function(line)
+				return not line:match("^%s*@[%w_.-]+%s*=")
+			end, lines)
+			return parse_request(request_lines)
+		end)
+
+		local environment = http_client.environment
+		local get_current_env = environment.get_current_env
+		rawset(environment, "get_current_env", function()
+			local variables = get_current_env()
+			if vim.bo.filetype ~= "http" then
+				return variables
+			end
+			for _, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, -1, false)) do
+				local name, value = line:match("^%s*@([%w_.-]+)%s*=%s*(.-)%s*$")
+				if name then
+					variables[name] = value
+				end
+			end
+			return vim.tbl_extend("force", variables, environment.get_global_variables())
+		end)
+
+		local completion = http_client.completion
+		rawset(completion, "env_var_completion", function(findstart, base)
+			local before_cursor = vim.api.nvim_get_current_line():sub(1, vim.api.nvim_win_get_cursor(0)[2])
+			local start = before_cursor:find("{{[%w_.-]*$")
+			if findstart == 1 then
+				return start and start + 1 or -1
+			end
+			if not start then
+				return {}
+			end
+			local items = {}
+			for name, value in pairs(environment.get_current_env()) do
+				if type(name) == "string" and name:sub(1, #base) == base then
+					table.insert(items, {
+						word = name,
+						kind = "v",
+						menu = "[HTTP variable]",
+						info = tostring(value),
+					})
+				end
+			end
+			return items
+		end)
+
+		local function setup_completion()
+			vim.bo.omnifunc = 'v:lua.require("http_client.completion").env_var_completion'
+			vim.bo.completefunc = 'v:lua.require("http_client.completion").http_completion'
+		end
+		vim.api.nvim_create_autocmd("FileType", { pattern = "http", callback = setup_completion })
+		if vim.bo.filetype == "http" then
+			setup_completion()
+		end
+
 		-- Preserve repeated Set-Cookie headers before the plugin flattens them.
 		local response_handler = require("http_client.core.response_handler")
 		local execute_response_handler = response_handler.execute
-		response_handler.execute = function(script, response)
+		rawset(response_handler, "execute", function(script, response)
 			local headers, cookies = {}, {}
 			for key, value in pairs(response.headers or {}) do
 				local name, cookie
@@ -32,7 +121,7 @@ return {
 			end
 			local adapted = vim.tbl_extend("force", {}, response, { headers = headers })
 			return execute_response_handler(script, adapted)
-		end
+		end)
 
 		local function load_buffer_env(buf)
 			local path = vim.api.nvim_buf_get_name(buf)
