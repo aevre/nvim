@@ -76,7 +76,7 @@ return {
 						name = "OmniFunc",
 						module = "blink.cmp.sources.complete_func",
 						enabled = function()
-							return vim.bo.omnifunc ~= ""
+							return vim.bo.omnifunc ~= "v:lua.vim.lsp.omnifunc"
 						end,
 						opts = {
 							complete_func = function()
