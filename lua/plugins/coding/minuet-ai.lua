@@ -13,7 +13,7 @@ return {
 					return os.getenv("OPENROUTER_TOKEN")
 				end,
 				end_point = "https://openrouter.ai/api/v1/chat/completions",
-				model = "openrouter/free",
+				model = "nvidia/nemotron-3.5-lightning:free",
 				name = "Openrouter",
 				optional = {
 					max_tokens = 56,

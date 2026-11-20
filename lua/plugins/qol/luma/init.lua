@@ -29,7 +29,7 @@ return {
 		models = {
 			openrouter = {
 				backend = "openai",
-				model = "openrouter/free",
+				model = "nvidia/nemotron-3.5-lightning:free",
 				url = "https://openrouter.ai/api/v1/chat/completions",
 				api_key = "OPENROUTER_TOKEN",
 			},
