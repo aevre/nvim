@@ -29,7 +29,7 @@ return {
 		models = {
 			openrouter = {
 				backend = "openai",
-				model = "cohere/north-mini-code:free",
+				model = "openrouter/free",
 				url = "https://openrouter.ai/api/v1/chat/completions",
 				api_key = "OPENROUTER_TOKEN",
 			},

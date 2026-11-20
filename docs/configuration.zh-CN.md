@@ -62,7 +62,7 @@ Treesitter 使用 `main` 分支，在 `BufReadPre`、`BufNewFile` 或 `VeryLazy`
 | `OPENROUTER_TOKEN` | Minuet 补全及 Luma 的 OpenRouter 模型 |
 | `TAVILY_TOKEN` | Luma 网页搜索 |
 
-Minuet 和 Luma 当前使用 `cohere/north-mini-code:free`；模型是否仍可用取决于服务端。Luma 聊天历史保存于 `stdpath('cache')/luma-history`，最多保留 15 条。用户定义的 Luma 工具按 `lua/plugins/qol/luma/tools/*.lua` 分模块保存，可分别修改提示词和行为，例如提交信息提示词位于 `tools/commit.lua`。`tools/translate.lua` 打开独立的一次性翻译窗口：每次提交只发送翻译提示词和当前输入，随后清空输入，并将历史保存到 `luma-history/tools/translate`，不会修改主 Chat。窗口内按 `m` 切换模型，按 `h` 查看翻译历史。`tools/word_translate.lua` 翻译光标下单词或可视选区。可在任一工具模块中设置 `model = "模型名"` 作为工具默认模型；`nil` 表示跟随全局模型。提交和 Bash 执行仍在对应用户工具模块中要求显式确认。
+Minuet 和 Luma 使用 OpenRouter 的 `openrouter/free` 路由，由服务端为每次请求选择当前可用的免费模型。Luma 聊天历史保存于 `stdpath('cache')/luma-history`，最多保留 15 条。用户定义的 Luma 工具按 `lua/plugins/qol/luma/tools/*.lua` 分模块保存，可分别修改提示词和行为，例如提交信息提示词位于 `tools/commit.lua`。`tools/translate.lua` 打开独立的一次性翻译窗口：每次提交只发送翻译提示词和当前输入，随后清空输入，并将历史保存到 `luma-history/tools/translate`，不会修改主 Chat。窗口内按 `m` 切换模型，按 `h` 查看翻译历史。`tools/word_translate.lua` 翻译光标下单词或可视选区。可在任一工具模块中设置 `model = "模型名"` 作为工具默认模型；`nil` 表示跟随全局模型。提交和 Bash 执行仍在对应用户工具模块中要求显式确认。
 
 ## 文件类型与主题
 
