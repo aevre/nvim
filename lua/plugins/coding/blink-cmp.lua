@@ -6,9 +6,9 @@ return {
 		event = { "InsertEnter", "CmdlineEnter" },
 		opts_extend = { "sources.default" },
 		dependencies = {
-			{ dir = vim.fn.expand("~/Projects/lib/blink-css-vars.nvim") },
 			"milanglacier/minuet-ai.nvim",
 			"niuiic/blink-cmp-rg.nvim",
+			"aevre/blink-css-vars.nvim",
 			"rafamadriz/friendly-snippets",
 			"saghen/blink.lib",
 			"nvim-mini/mini.icons",
