@@ -79,6 +79,7 @@ return {
 		optional = true,
 		opts = {
 			sources = {
+				default = { "minuet" },
 				providers = {
 					minuet = {
 						name = "minuet",

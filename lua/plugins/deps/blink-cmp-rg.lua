@@ -9,6 +9,7 @@ return {
 		optional = true,
 		opts = {
 			sources = {
+				default = { "ripgrep" },
 				providers = {
 					ripgrep = {
 						name = "Ripgrep",

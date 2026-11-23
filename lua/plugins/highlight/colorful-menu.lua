@@ -55,6 +55,9 @@ return {
 				kind_icon = {
 					ellipsis = false,
 					text = function(ctx)
+						if ctx.source_id == "css_vars" and ctx.item.data and ctx.item.data.css_var_color then
+							return "■" .. (ctx.icon_gap or "")
+						end
 						local kind = ctx.source_name == "minuet" and "minuet" or ctx.kind
 						local icon = kind_icons[kind]
 						if not icon then
@@ -63,6 +66,10 @@ return {
 						return (icon or "") .. (ctx.icon_gap or "")
 					end,
 					highlight = function(ctx)
+						local color = require("blink-css-vars.color").highlight(ctx)
+						if color then
+							return color
+						end
 						local kind = ctx.source_name == "minuet" and "minuet" or ctx.kind
 						local _, hl, _ = mini_icons.get("lsp", kind)
 						return hl

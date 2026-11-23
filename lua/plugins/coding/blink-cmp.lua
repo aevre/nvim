@@ -4,7 +4,9 @@ return {
 	{
 		"saghen/blink.cmp",
 		event = { "InsertEnter", "CmdlineEnter" },
+		opts_extend = { "sources.default" },
 		dependencies = {
+			{ dir = vim.fn.expand("~/Projects/lib/blink-css-vars.nvim") },
 			"milanglacier/minuet-ai.nvim",
 			"niuiic/blink-cmp-rg.nvim",
 			"rafamadriz/friendly-snippets",
@@ -58,8 +60,6 @@ return {
 					"snippets",
 					"path",
 					"buffer",
-					"ripgrep",
-					"minuet",
 				},
 				providers = {
 					complete_func = {
