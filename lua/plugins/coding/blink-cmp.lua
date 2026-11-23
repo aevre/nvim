@@ -87,6 +87,22 @@ return {
 					minuet = {
 						name = "minuet",
 						module = "minuet.blink",
+						transform_items = function(ctx, items)
+							local start_col =
+								require("blink.cmp.fuzzy").get_keyword_range(ctx.line, ctx.cursor[2], "prefix")
+							local prefix = ctx.line:sub(start_col + 1, ctx.cursor[2])
+							for _, item in ipairs(items) do
+								local col = item.insertText:sub(1, #prefix) == prefix and start_col or ctx.cursor[2]
+								item.textEdit = {
+									newText = item.insertText,
+									range = {
+										start = { line = ctx.cursor[1] - 1, character = col },
+										["end"] = { line = ctx.cursor[1] - 1, character = ctx.cursor[2] },
+									},
+								}
+							end
+							return items
+						end,
 						async = true,
 						timeout_ms = 3000,
 						score_offset = 50,
