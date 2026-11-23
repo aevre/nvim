@@ -9,6 +9,8 @@ return {
 			"niuiic/blink-cmp-rg.nvim",
 			"rafamadriz/friendly-snippets",
 			"saghen/blink.lib",
+			"nvim-mini/mini.icons",
+			"xzbdmw/colorful-menu.nvim",
 		},
 		-- version = "1.*",
 		build = function()
@@ -84,53 +86,6 @@ return {
 							end,
 						},
 					},
-					minuet = {
-						name = "minuet",
-						module = "minuet.blink",
-						transform_items = function(ctx, items)
-							local start_col =
-								require("blink.cmp.fuzzy").get_keyword_range(ctx.line, ctx.cursor[2], "prefix")
-							local prefix = ctx.line:sub(start_col + 1, ctx.cursor[2])
-							for _, item in ipairs(items) do
-								local col = item.insertText:sub(1, #prefix) == prefix and start_col or ctx.cursor[2]
-								item.textEdit = {
-									newText = item.insertText,
-									range = {
-										start = { line = ctx.cursor[1] - 1, character = col },
-										["end"] = { line = ctx.cursor[1] - 1, character = ctx.cursor[2] },
-									},
-								}
-							end
-							return items
-						end,
-						async = true,
-						timeout_ms = 3000,
-						score_offset = 50,
-					},
-					ripgrep = {
-						name = "Ripgrep",
-						module = "blink-cmp-rg",
-						opts = {
-							prefix_min_len = 3,
-							get_command = function(_, prefix)
-								return {
-									"rg",
-									"--no-config",
-									"--json",
-									"--word-regexp",
-									"--ignore-case",
-									"--",
-									prefix .. "[\\w_-]+",
-									vim.fs.root(0, ".git") or vim.fn.getcwd(),
-								}
-							end,
-							get_prefix = function(context)
-								return context.line:sub(1, context.cursor[2]):match("[%w_-]+$") or ""
-							end,
-						},
-						max_items = 3,
-						score_offset = -20,
-					},
 				},
 			},
 			fuzzy = {
@@ -157,112 +112,8 @@ return {
         ['<A-8>'] = { function(cmp) return cmp.accept({ index = 8 }) end },
         ['<A-9>'] = { function(cmp) return cmp.accept({ index = 9 }) end },
         ['<A-0>'] = { function(cmp) return cmp.accept({ index = 10 }) end },
-        ['<A-y>'] = { function(cmp)
-          require('minuet').change_preset('openrouter')
-          return cmp.show({ providers = { 'minuet' } })
-        end },
-        ['<A-o>'] = { function(cmp)
-          require('minuet').change_preset('ollama')
-          return cmp.show({ providers = { 'minuet' } })
-        end },
 				-- stylua: ignore end
 			},
 		},
-	},
-
-	-- Completion Icon and Highlighting
-	---@type LazyPluginSpec
-	{
-		"saghen/blink.cmp",
-		opts = function(_, opts)
-			local mini_icons = require("mini.icons")
-			local colorful_menu = require("colorful-menu")
-			local kind_icons = {
-				Array = "󰅪",
-				Boolean = "󰨙",
-				Class = "󰠱",
-				Color = "󰏘",
-				Constant = "󰏿",
-				Constructor = "",
-				Enum = "",
-				EnumMember = "",
-				Event = "",
-				Field = "󰜢",
-				File = "󰈙",
-				Folder = "󰉋",
-				Function = "󰊕",
-				Interface = "",
-				Key = "󰌋",
-				Keyword = "󰌋",
-				Method = "󰡱",
-				Module = "󰏗",
-				Namespace = "󰏗",
-				Null = "󰟢",
-				Number = "󰎠",
-				Object = "󰅩",
-				Operator = "󰆕",
-				Package = "󰏗",
-				Property = "󰜢",
-				Reference = "󰈇",
-				Snippet = "󰲋",
-				String = "󰉿",
-				Struct = "󰙅",
-				Text = "󰉿",
-				TypeParameter = "󰊄",
-				Unit = "󰑭",
-				Value = "󰎠",
-				Variable = "󰫧",
-				minuet = "󰚩",
-			}
-
-			opts.completion.menu.draw.components = vim.tbl_extend("force", opts.completion.menu.draw.components or {}, {
-				kind_icon = {
-					ellipsis = false,
-					text = function(ctx)
-						local kind = ctx.source_name == "minuet" and "minuet" or ctx.kind
-						local icon = kind_icons[kind]
-						if not icon then
-							icon = mini_icons.get("lsp", kind)
-						end
-						return (icon or "") .. (ctx.icon_gap or "")
-					end,
-					highlight = function(ctx)
-						local kind = ctx.source_name == "minuet" and "minuet" or ctx.kind
-						local _, hl, _ = mini_icons.get("lsp", kind)
-						return hl
-					end,
-				},
-				label = {
-					width = { max = 20 },
-					text = function(ctx)
-						return colorful_menu.blink_components_text(ctx)
-					end,
-					highlight = function(ctx)
-						return colorful_menu.blink_components_highlight(ctx)
-					end,
-				},
-				kind = {
-					highlight = function(ctx)
-						if vim.tbl_contains({ "Path" }, ctx.source_name) then
-							local path_type = ctx.item.data.type
-							local category = (path_type == "directory" or path_type == "link") and "directory" or "file"
-							local mini_icon, mini_hl = mini_icons.get("default", category)
-							if mini_icon then
-								return mini_hl
-							end
-						end
-						return ctx.kind_hl
-					end,
-				},
-
-				label_description = {
-					width = { max = 20 },
-					text = function(ctx)
-						return ctx.label_description
-					end,
-					highlight = "BlinkCmpLabelDescription",
-				},
-			})
-		end,
 	},
 }
