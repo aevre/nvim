@@ -53,6 +53,7 @@ return {
 			{ "<leader>g", group = "git" },
 			{ "<leader>l", group = "lsp" },
 			{ "<leader>o", group = "overseer" },
+			{ "<leader>O", group = "org" },
 			{ "<leader>t", group = "terminal" },
 			{ "<leader>u", group = "ui" },
 			{ "<leader>w", group = "window" },
