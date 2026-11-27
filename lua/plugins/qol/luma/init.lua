@@ -33,10 +33,17 @@ return {
 				url = "https://openrouter.ai/api/v1/chat/completions",
 				api_key = "OPENROUTER_TOKEN",
 			},
-			ollama = {
+			["qwen2.5-coder:1.5b"] = {
 				backend = "ollama",
 				model = "qwen2.5-coder:1.5b",
 				url = "http://127.0.0.1:11434/api/chat",
+			},
+			["qwen3.5:4b"] = {
+				backend = "ollama",
+				model = "qwen3.5:4b",
+				think = false,
+				url = "http://127.0.0.1:11434/api/chat",
+				timeout = 600000,
 			},
 		},
 		web_search = {
@@ -61,6 +68,13 @@ return {
 			"<Esc><cmd>'<,'>LumaTool explain<cr>",
 			mode = "x",
 			desc = "Explain selection",
+		},
+		{ "<leader>ad", "<cmd>LumaTool document_buffer<cr>", desc = "Document buffer in English" },
+		{
+			"<leader>ad",
+			"<Esc><cmd>'<,'>LumaTool document_selection<cr>",
+			mode = "x",
+			desc = "Document selection in English",
 		},
 		{
 			"<leader>aw",

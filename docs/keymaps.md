@@ -220,6 +220,7 @@ Source: [oil.lua](../lua/plugins/qol/oil.lua), [mini-files.lua](../lua/plugins/q
 | `<leader>aa` | `x` | Attach the selection to chat |
 | `<leader>ak` | `n` | Ask Luma |
 | `<leader>ae` | `n,x` | Explain the buffer or selection |
+| `<leader>ad` | `n,x` | Preview English documentation comments for the buffer or selection in a diff |
 | `<leader>aw` | `n,x` | Translate the word under cursor or the selection |
 | `<leader>at` | `n` | Open Luma chat with a translation instruction |
 | `<leader>aT` / `<leader>ao` | `x` | Generate tests / rewrite |
