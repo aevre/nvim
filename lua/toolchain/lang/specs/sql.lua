@@ -1,2 +1,5 @@
 ---@type LanguageSpec
-return { filetypes = { "sql" }, formatters = { "sqruff" } }
+return {
+	filetypes = { "sql" },
+	formatters = { "sqruff" },
+}
