@@ -78,6 +78,17 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
+vim.api.nvim_create_autocmd("CmdwinEnter", {
+	group = vim.api.nvim_create_augroup("quit_cmdwin", { clear = true }),
+	callback = function(event)
+		vim.keymap.set("n", "q", "<C-c>", {
+			buffer = event.buf,
+			silent = true,
+			desc = "关闭命令行历史窗口",
+		})
+	end,
+})
+
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "fzf",
 	callback = function()
