@@ -10,7 +10,7 @@ local function restore_escaped_newlines(text)
 end
 
 local LANGUAGE_PROMPTS = {
-	go = "Follow GoDoc: use // immediately before exported declarations; start the first sentence with the declared name (the method name for methods). Use // Package <name> only when useful. No /** */, ///, or @param tags.",
+	go = "Follow GoDoc: use // immediately before exported declarations; start the first sentence with the declared name (the method name for methods). Add a package comment immediately before the package clause, starting with 'Package <name>' and briefly describing the package when its purpose is not obvious. No /** */, ///, or @param tags.",
 	lua = "Use LuaDoc/EmmyLua --- comments before public functions and types; add ---@param and ---@return only when their types or meanings are useful and not already documented.",
 	luau = "Use Luau --- documentation comments before public declarations; do not introduce LuaDoc annotations unless the project already uses them.",
 	python = "Use concise Python docstrings inside public functions, classes, and modules; follow the existing project's docstring style. Do not use JSDoc or // comments.",
